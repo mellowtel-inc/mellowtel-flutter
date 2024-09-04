@@ -46,7 +46,7 @@ class MacOSWebViewManager extends WebViewManager {
       screenshot = await _webViewController!.takeScreenshot();
     }
     final finalUri = await _webViewController!.getUrl();
-    final String? finalUrl = finalUri?.uriValue.toString();
+    final String? finalUrl = finalUri?.toString();
 
     return {
       'html': html,
@@ -59,7 +59,7 @@ class MacOSWebViewManager extends WebViewManager {
   Future<void> _loadUrlAndWait(String url, String? removeCSSselectors) async {
     _pageLoadCompleter = Completer<void>();
     developer.log('sending loadUrl Requests');
-    await _webViewController!.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
+    await _webViewController!.loadUrl(urlRequest: URLRequest(url: Uri.parse(url)));
     developer.log('sending loadUrl rquest sent');
     await _pageLoadCompleter!.future;
     developer.log('load url future completed');

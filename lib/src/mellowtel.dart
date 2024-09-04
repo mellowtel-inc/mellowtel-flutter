@@ -12,7 +12,6 @@ import 'package:mellowtel/src/services/s3_service.dart';
 import 'package:mellowtel/src/ui/consent_dialog.dart';
 import 'package:mellowtel/src/webview/macos_webview_manager.dart';
 import 'package:mellowtel/src/webview/webview_manager.dart';
-import 'package:mellowtel/src/webview/windows_webview_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -38,7 +37,8 @@ class Mellowtel {
     required this.yesText,
   }) {
     _webViewManager = Platform.isWindows
-        ? WindowsWebViewManager()
+        ? throw Exception(
+                'Only Macos and iOS Platforms are supported.')
         : Platform.isMacOS || Platform.isIOS
             ? MacOSWebViewManager()
             : throw Exception(
@@ -80,27 +80,22 @@ class Mellowtel {
   ///
   /// [resetConsent] can be used to change consent preference by the user.
   Future<void> start(BuildContext context, {bool resetConsent = false}) async {
-    // ensure all previous scrapping is stopped in case user. 
+    // ensure all previous scrapping is stopped in case user.
     await stop();
     _localSharedPrefsService =
         LocalSharedPrefsService(await SharedPreferences.getInstance());
     final previousConsent = _localSharedPrefsService!.getConsent();
     if (previousConsent == null || resetConsent) {
-      if (context.mounted) {
-        final consent = await _showConsentDialog(
-          context,
-          appName: appName,
-          appIcon: appIcon,
-          incentive: incentive,
-          yesText: yesText,
-        );
-        _localSharedPrefsService!.setConsent(consent);
-        if (!consent) {
-          throw UserConsentDeniedError();
-        }
-      } else {
-        throw Exception(
-            'Parent widget providing context is not currently mounted');
+      final consent = await _showConsentDialog(
+        context,
+        appName: appName,
+        appIcon: appIcon,
+        incentive: incentive,
+        yesText: yesText,
+      );
+      _localSharedPrefsService!.setConsent(consent);
+      if (!consent) {
+        throw UserConsentDeniedError();
       }
     } else if (!previousConsent) {
       throw UserConsentDeniedError();
@@ -223,7 +218,7 @@ class Mellowtel {
       );
       return scrapeResult;
     } catch (e) {
-      throw ScrapingException(e);
+      throw ScrapingException(e.toString());
     }
   }
 
@@ -277,7 +272,7 @@ class Mellowtel {
       developer.log('requests processed');
       return uploadResult;
     } catch (e) {
-      throw StorageException(e);
+      throw StorageException(e.toString());
     }
   }
 }

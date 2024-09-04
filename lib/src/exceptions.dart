@@ -8,11 +8,11 @@ abstract class MellowtelException implements Exception {
 }
 
 class ScrapingException extends MellowtelException {
-  ScrapingException(super.message);
+  ScrapingException(String message) : super(message);
 }
 
 class StorageException extends MellowtelException {
-  StorageException(super.message);
+  StorageException(String message) : super(message);
 }
 
 

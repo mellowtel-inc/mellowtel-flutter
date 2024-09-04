@@ -8,12 +8,12 @@ class ConsentDialog extends StatelessWidget {
   final String yesText;
 
   const ConsentDialog({
-    super.key,
+    Key? key,
     required this.appName,
     required this.asset,
     required this.incentive,
     required this.yesText,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class ConsentDialog extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildInformationWidget(context),
-                        SizedBox(height: 20.0),
+                        const SizedBox(height: 20.0),
                         Center(child: _buildActions(context)),
                       ],
                     ),
@@ -100,8 +100,8 @@ class ConsentDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(width: 16.0),
-              const Column(
-                children: [Icon(Icons.sync_alt), Text("")],
+              Column(
+                children: const [Icon(Icons.sync_alt), Text("")],
               ),
               const SizedBox(width: 16.0),
               Column(
@@ -117,8 +117,8 @@ class ConsentDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(width: 16.0),
-              const Column(
-                children: [Icon(Icons.sync_alt), Text("")],
+              Column(
+                children: const [Icon(Icons.sync_alt), Text("")],
               ),
               const SizedBox(width: 16.0),
               Column(
@@ -135,7 +135,7 @@ class ConsentDialog extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 24.0),
+          const SizedBox(height: 24.0),
           Row(
             children: [
               Expanded(
@@ -150,7 +150,7 @@ class ConsentDialog extends StatelessWidget {
                     Navigator.of(context)
                         .pop(false); // Returns false on decline
                   },
-                  child: Text('No'),
+                  child: const Text('No'),
                 ),
               ),
               const SizedBox(width: 8.0),
@@ -161,8 +161,8 @@ class ConsentDialog extends StatelessWidget {
                         .pop(true); // Returns true on acceptance
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    onSurface: Theme.of(context).primaryColor,
+                    onPrimary: Theme.of(context).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
                       vertical: 16.0,
