@@ -12,7 +12,7 @@ class WindowsWebViewManager extends WebViewManager {
 
   @override
   Future<void> initialize() async {
-    developer.log("Initializing Windows WebView");
+    developer.log("Mellowtel: Initializing Windows WebView");
     _webViewController = windows_webview.WebviewController();
     await _webViewController!.initialize();
   }

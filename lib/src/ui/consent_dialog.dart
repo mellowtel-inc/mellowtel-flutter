@@ -202,7 +202,7 @@ class ConsentDialog extends StatelessWidget {
       children: [
         // App Icon
         Align(
-          alignment: Alignment.topLeft,
+          alignment: Alignment.centerLeft,
           child: Image.asset(
             asset,
             height: 64,
@@ -228,8 +228,9 @@ class ConsentDialog extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16.0),
-        const Text(
+        Text(
           'None of your personal information is collected, except your IP address.\n\nYour participation is totally optional and you may opt out at any time.',
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
     );
