@@ -7,7 +7,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key key}): super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HtmlExtractorWidget extends StatefulWidget {
-  const HtmlExtractorWidget({super.key});
+  const HtmlExtractorWidget({Key key}): super(key: key);
 
   @override
   HtmlExtractorWidgetState createState() => HtmlExtractorWidgetState();
