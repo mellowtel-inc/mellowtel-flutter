@@ -185,7 +185,7 @@ class Mellowtel {
             url: scrapeRequest.url,
             htmlTransformer: scrapeRequest.htmlTransformer);
         await DynamoService.updateDynamo(uploadResult);
-        developer.log('Scrape result posted');
+        developer.log('MellowTel: Scrape result posted');
         onScrapingResult?.call(scrapeResult);
       }
     } on ScrapingException catch (e) {
@@ -269,7 +269,6 @@ class Mellowtel {
         orgId: scrapeResult.orgId,
         htmlTransformer: htmlTransformer,
       );
-      developer.log('requests processed');
       return uploadResult;
     } catch (e) {
       throw StorageException(e.toString());

@@ -43,7 +43,7 @@ class S3Service implements StorageService {
   @override
   Future<void> uploadHtml(String htmlUrlSigned, String content) async {
     final client = CustomHttpClient(contentType: 'text/html');
-    final Stopwatch stopwatch = Stopwatch()..start();
+    // final Stopwatch stopwatch = Stopwatch()..start();
 
     final response = await client.put(
       Uri.parse(htmlUrlSigned),
@@ -53,7 +53,7 @@ class S3Service implements StorageService {
       },
       body: content,
     );
-    developer.log("===>html: ${stopwatch.elapsedMilliseconds}");
+    // developer.log("===>html: ${stopwatch.elapsedMilliseconds}");
 
     if (response.statusCode != 200) {
       throw Exception('Failed to upload HTML');
@@ -63,7 +63,7 @@ class S3Service implements StorageService {
   @override
   Future<void> uploadMarkdown(String markdownUrlSigned, String content) async {
     final client = CustomHttpClient(contentType: 'text/markdown');
-    final Stopwatch stopwatch = Stopwatch()..start();
+    // final Stopwatch stopwatch = Stopwatch()..start();
     final response = await client.put(
       Uri.parse(markdownUrlSigned),
       headers: {
@@ -72,7 +72,7 @@ class S3Service implements StorageService {
       },
       body: content,
     );
-    developer.log("===>markdown: ${stopwatch.elapsedMilliseconds}");
+    // developer.log("===>markdown: ${stopwatch.elapsedMilliseconds}");
     if (response.statusCode != 200) {
       throw Exception('Failed to upload Markdown');
     }
@@ -81,7 +81,7 @@ class S3Service implements StorageService {
   @override
   Future<void> uploadImage(String imageUrlSigned, Uint8List base64Image) async {
     final client = CustomHttpClient(contentType: 'image/png');
-    final Stopwatch stopwatch = Stopwatch()..start();
+    // final Stopwatch stopwatch = Stopwatch()..start();
     final response = await client.put(
       Uri.parse(imageUrlSigned),
       headers: {
@@ -91,7 +91,7 @@ class S3Service implements StorageService {
       },
       body: base64Image,
     );
-    developer.log("===>image: ${stopwatch.elapsedMilliseconds}");
+    // developer.log("===>image: ${stopwatch.elapsedMilliseconds}");
 
     if (response.statusCode != 200) {
       throw Exception('Failed to upload image');
