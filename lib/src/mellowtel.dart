@@ -62,6 +62,10 @@ class Mellowtel {
   final String incentive;
   final String yesText;
 
+  int _reconnectAttempts = 0;
+  final int _maxReconnectAttempts = 5;
+  final Duration _initialReconnectDelay = const Duration(seconds: 1);
+
   /// Tests the crawling process with a given [request].
   ///
   /// This method initializes the WebView, sends the [request] as a message,
@@ -80,7 +84,7 @@ class Mellowtel {
   ///
   /// [resetConsent] can be used to change consent preference by the user.
   Future<void> start(BuildContext context, {bool resetConsent = false}) async {
-    // ensure all previous scrapping is stopped in case user. 
+    // ensure all previous scrapping is stopped in case user.
     await stop();
     _localSharedPrefsService =
         LocalSharedPrefsService(await SharedPreferences.getInstance());
@@ -119,10 +123,35 @@ class Mellowtel {
 
     final url =
         'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$_nodeId&version=$version&platform=$platform';
+    _connectWebSocket(url);
+  }
+
+  void _connectWebSocket(String url) {
     _channel = WebSocketChannel.connect(Uri.parse(url));
+
     _channel!.stream.listen((message) {
       _onMessage(message);
+    }, onDone: () {
+      /// 1005 is the close code when termination is voluntarily terminated
+      if (_channel != null && _channel?.closeCode != 1005) {
+        developer.log('WebSocket Closed with Code: ${_channel?.closeCode}');
+        _handleDisconnection(url);
+      }
     });
+  }
+
+  Future<void> _handleDisconnection(String url) async {
+    if (_reconnectAttempts < _maxReconnectAttempts) {
+      final delay = _initialReconnectDelay * (1 << _reconnectAttempts);
+      developer.log(
+          'WebSocket disconnected. Reconnecting in ${delay.inSeconds} seconds...');
+      Future.delayed(delay, () {
+        _reconnectAttempts++;
+        _connectWebSocket(url);
+      });
+    } else {
+      developer.log('Max reconnection attempts reached. Giving up.');
+    }
   }
 
   /// Stops the crawling process by closing the WebSocket connection.
