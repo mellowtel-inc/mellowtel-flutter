@@ -14,6 +14,3 @@ class ScrapingException extends MellowtelException {
 class StorageException extends MellowtelException {
   StorageException(String message) : super(message);
 }
-
-
-class UserConsentDeniedError extends Error{}

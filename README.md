@@ -45,7 +45,20 @@ final Mellowtel mellowtel = Mellowtel(
 Use the `start()` method to initiate the scraping process.
 
 ```dart
-await mellowtel.start(context)
+await mellowtel.start(context,
+      resetConsent: true, 
+      onOptIn: () {
+        //TODO: Enable user's incentives if they have opted in.
+      }, 
+      onOptOut: () {
+        // TODO: Handle what happens if consent is denied.
+
+        // You have the option to ask user to change consent preference
+        // await mellowtel.start(context, resetConsent: true)
+
+        // You can also check the consent status at any time with
+        // await mellowtel.checkConsent();
+  });
 ```
 
 This will open up a one-time consent popup for the user to accept.

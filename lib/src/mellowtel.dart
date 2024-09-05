@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:mellowtel/src/exceptions.dart';
 import 'package:mellowtel/src/model/scrape_request.dart';
@@ -62,6 +63,10 @@ class Mellowtel {
   final String incentive;
   final String yesText;
 
+  int _reconnectAttempts = 0;
+  final int _maxReconnectAttempts = 5;
+  final Duration _initialReconnectDelay = const Duration(seconds: 1);
+
   /// Tests the crawling process with a given [request].
   ///
   /// This method initializes the WebView, sends the [request] as a message,
@@ -78,46 +83,86 @@ class Mellowtel {
 
   /// Starts the crawling process by establishing a WebSocket connection.
   ///
+  /// [onOptIn] and [onOptOut] allow you to enable or disable services based on user's choice.
+  /// They are only called the first time user makes a choice or if changes their consent later.
+  ///
   /// [resetConsent] can be used to change consent preference by the user.
-  Future<void> start(BuildContext context, {bool resetConsent = false}) async {
-    // ensure all previous scrapping is stopped in case user.
-    await stop();
-    _localSharedPrefsService =
-        LocalSharedPrefsService(await SharedPreferences.getInstance());
-    final previousConsent = _localSharedPrefsService!.getConsent();
-    if (previousConsent == null || resetConsent) {
-      final consent = await _showConsentDialog(
-        context,
-        appName: appName,
-        appIcon: appIcon,
-        incentive: incentive,
-        yesText: yesText,
-      );
-      _localSharedPrefsService!.setConsent(consent);
-      if (!consent) {
-        throw UserConsentDeniedError();
+  Future<void> start(BuildContext context,
+      {required OnOptIn onOptIn,
+      required OnOptOut onOptOut,
+      bool resetConsent = false}) async {
+    try {
+      // ensure all previous scrapping is stopped in case user.
+      await stop();
+      _localSharedPrefsService =
+          LocalSharedPrefsService(await SharedPreferences.getInstance());
+      final previousConsent = _localSharedPrefsService!.getConsent();
+      if (previousConsent == null || resetConsent) {
+        if (context.mounted) {
+          final consent = await _showConsentDialog(
+            context,
+            appName: appName,
+            appIcon: appIcon,
+            incentive: incentive,
+            yesText: yesText,
+          );
+
+          // Only call if user changes the consent.
+          if (previousConsent != consent) {
+            consent ? onOptIn() : onOptOut();
+          }
+          _localSharedPrefsService!.setConsent(consent);
+        } else {
+          developer.log(
+              'mellowtel: Parent widget providing context is not currently mounted');
+        }
       }
-    } else if (!previousConsent) {
-      throw UserConsentDeniedError();
+      await _webViewManager.initialize();
+      const version = '0.0.1';
+
+      // flutter-macos or flutter-windows
+      final platform = Platform.operatingSystem == 'macos'
+          ? 'flutter-macos'
+          : Platform.operatingSystem == 'windows'
+              ? 'flutter-windows'
+              : Platform.operatingSystem == 'ios'
+                  ? 'flutter-ios'
+                  : 'flutter';
+
+      final url =
+          'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$_nodeId&version=$version&platform=$platform';
+      _connectWebSocket(url);
+    } catch (e) {
+      developer.log('mellowtel: $e');
     }
-    await _webViewManager.initialize();
-    const version = '0.0.1';
+  }
 
-    // flutter-macos or flutter-windows
-    final platform = Platform.operatingSystem == 'macos'
-        ? 'flutter-macos'
-        : Platform.operatingSystem == 'windows'
-            ? 'flutter-windows'
-            : Platform.operatingSystem == 'ios'
-                ? 'flutter-ios'
-                : 'flutter';
-
-    final url =
-        'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$_nodeId&version=$version&platform=$platform';
+  void _connectWebSocket(String url) {
     _channel = WebSocketChannel.connect(Uri.parse(url));
+
     _channel!.stream.listen((message) {
       _onMessage(message);
+    }, onDone: () {
+      /// 1005 is the close code when termination is voluntarily terminated
+      if (_channel != null && _channel?.closeCode != 1005) {
+        developer.log('WebSocket Closed with Code: ${_channel?.closeCode}');
+        _handleDisconnection(url);
+      }
     });
+  }
+
+  Future<void> _handleDisconnection(String url) async {
+    if (_reconnectAttempts < _maxReconnectAttempts) {
+      final delay = _initialReconnectDelay * (1 << _reconnectAttempts);
+      developer.log(
+          'WebSocket disconnected. Reconnecting in ${delay.inSeconds} seconds...');
+      Future.delayed(delay, () {
+        _reconnectAttempts++;
+        _connectWebSocket(url);
+      });
+    } else {
+      developer.log('Max reconnection attempts reached. Giving up.');
+    }
   }
 
   /// Stops the crawling process by closing the WebSocket connection.
