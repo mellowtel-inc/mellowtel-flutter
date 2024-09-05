@@ -34,8 +34,7 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
     "123",
     appName: 'King Kong',
     appIcon: 'asset/logo.png',
-    incentive:
-        'Earn 500 coins in Sling Kong',
+    incentive: 'Earn 500 coins in Sling Kong',
     yesText: 'FREE Coins!',
   );
 
@@ -78,20 +77,17 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
           Center(
             child: ElevatedButton(
               onPressed: () async {
-                try {
-                  await mellowtel.start(context, resetConsent: true);
-                } catch (e) {
-                  if (e is UserConsentDeniedError) {
-                    // TODO: Handle what happens if consent is denied.
-                    // Restrict users from using X services.
+                await mellowtel.start(context,
+                    resetConsent: true, onOptIn: () {}, onOptOut: () {
+                  // TODO: Handle what happens if consent is denied.
+                  // Restrict users from using X services.
 
-                    // You have the option to ask user to change consent preference
-                    // await mellowtel.start(context, resetConsent: true)
+                  // You have the option to ask user to change consent preference
+                  // await mellowtel.start(context, resetConsent: true)
 
-                    // You can also check the consent status at any time with
-                    // await mellowtel.checkConsent();
-                  }
-                }
+                  // You can also check the consent status at any time with
+                  // await mellowtel.checkConsent();
+                });
               },
               child: const Text('Start'),
             ),
@@ -105,16 +101,15 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
                 /// Don't trigger after calling `start()`
                 mellowtel.test(
                   ScrapeRequest(
-                    recordID: '005ie7h3w5',
-                    url: 'https://www.mellowtel.dev/',
-                    waitBeforeScraping: 1,
-                    saveHtml: true,
-                    saveMarkdown: true,
-                    htmlVisualizer: true,
-                    orgId: 'mellowtel',
-                    htmlTransformer: 'none',
-                    removeCSSselectors: 'default'
-                  ),
+                      recordID: '005ie7h3w5',
+                      url: 'https://www.mellowtel.dev/',
+                      waitBeforeScraping: 1,
+                      saveHtml: true,
+                      saveMarkdown: true,
+                      htmlVisualizer: true,
+                      orgId: 'mellowtel',
+                      htmlTransformer: 'none',
+                      removeCSSselectors: 'default'),
                 );
               },
               child: const Text('Demo request'),
