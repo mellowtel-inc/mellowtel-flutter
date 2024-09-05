@@ -131,9 +131,6 @@ class Mellowtel {
 
     _channel!.stream.listen((message) {
       _onMessage(message);
-    }, onError: (error) {
-      developer.log('WebSocket error: $error');
-      _handleDisconnection(url);
     }, onDone: () {
       /// 1005 is the close code when termination is voluntarily terminated
       if (_channel != null && _channel?.closeCode != 1005) {
