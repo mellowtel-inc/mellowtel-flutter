@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
-
 import 'package:mellowtel/src/exceptions.dart';
 import 'package:mellowtel/src/model/scrape_request.dart';
 import 'package:mellowtel/src/model/scrape_result.dart';
@@ -38,8 +36,7 @@ class Mellowtel {
     required this.yesText,
   }) {
     _webViewManager = Platform.isWindows
-        ? throw Exception(
-                'Only Macos and iOS Platforms are supported.')
+        ? throw Exception('Only Macos and iOS Platforms are supported.')
         : Platform.isMacOS || Platform.isIOS
             ? MacOSWebViewManager()
             : throw Exception(
@@ -98,24 +95,22 @@ class Mellowtel {
           LocalSharedPrefsService(await SharedPreferences.getInstance());
       final previousConsent = _localSharedPrefsService!.getConsent();
       if (previousConsent == null || resetConsent) {
-        if (context.mounted) {
-          final consent = await _showConsentDialog(
-            context,
-            appName: appName,
-            appIcon: appIcon,
-            incentive: incentive,
-            yesText: yesText,
-          );
+        final consent = await _showConsentDialog(
+          context,
+          appName: appName,
+          appIcon: appIcon,
+          incentive: incentive,
+          yesText: yesText,
+        );
 
-          // Only call if user changes the consent.
-          if (previousConsent != consent) {
-            consent ? onOptIn() : onOptOut();
-          }
-          _localSharedPrefsService!.setConsent(consent);
-        } else {
-          developer.log(
-              'mellowtel: Parent widget providing context is not currently mounted');
+        // Only call if user changes the consent.
+        if (previousConsent != consent) {
+          consent ? onOptIn() : onOptOut();
         }
+        _localSharedPrefsService!.setConsent(consent);
+      } else {
+        developer.log(
+            'mellowtel: Parent widget providing context is not currently mounted');
       }
       await _webViewManager.initialize();
       const version = '0.0.1';
