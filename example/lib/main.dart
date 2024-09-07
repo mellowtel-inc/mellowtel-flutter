@@ -78,7 +78,7 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
             child: ElevatedButton(
               onPressed: () async {
                 await mellowtel.start(context,
-                    resetConsent: true, onOptIn: () {}, onOptOut: () {
+                    showDefaultConsentDialog: true, onOptIn: () {}, onOptOut: () {
                   // TODO: Handle what happens if consent is denied.
                   // Restrict users from using X services.
 

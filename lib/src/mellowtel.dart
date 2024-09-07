@@ -47,10 +47,14 @@ class Mellowtel {
 
   final String _nodeId;
   final _storageService = S3Service();
-  LocalSharedPrefsService? _localSharedPrefsService;
 
   WebSocketChannel? _channel;
   late WebViewManager _webViewManager;
+
+  LocalSharedPrefsService? _sharedPrefsService;
+  Future<LocalSharedPrefsService> get sharedPrefsService async =>
+      _sharedPrefsService ??
+      LocalSharedPrefsService(await SharedPreferences.getInstance());
 
   OnScrapingResult? onScrapingResult;
   OnScrapingException? onScrapingException;
@@ -85,55 +89,116 @@ class Mellowtel {
   /// [onOptIn] and [onOptOut] allow you to enable or disable services based on user's choice.
   /// They are only called the first time user makes a choice or if changes their consent later.
   ///
-  /// [resetConsent] can be used to change consent preference by the user.
+  /// [showDefaultConsentDialog] can be used to disable the default dialog and have your own opt-in.
   Future<void> start(BuildContext context,
       {required OnOptIn onOptIn,
       required OnOptOut onOptOut,
-      bool resetConsent = false}) async {
+      bool showDefaultConsentDialog = true}) async {
     try {
-      // ensure all previous scrapping is stopped in case user.
       await stop();
-      _localSharedPrefsService =
-          LocalSharedPrefsService(await SharedPreferences.getInstance());
-      final previousConsent = _localSharedPrefsService!.getConsent();
-      if (previousConsent == null || resetConsent) {
+      bool? consent = (await sharedPrefsService).getConsent();
+      if (consent == null) {
+        if (!showDefaultConsentDialog) {
+          throw Exception(
+              '[Mellowtel]: Please enable showDefaultConsentDialog or set user permission via optIn or optOut methods first.');
+        }
         if (context.mounted) {
-          final consent = await _showConsentDialog(
+          consent = await _showConsentDialog(
             context,
             appName: appName,
             appIcon: appIcon,
             incentive: incentive,
             yesText: yesText,
           );
+          consent ? onOptIn() : onOptOut();
 
-          // Only call if user changes the consent.
-          if (previousConsent != consent) {
-            consent ? onOptIn() : onOptOut();
-          }
-          _localSharedPrefsService!.setConsent(consent);
+          await (await sharedPrefsService).setConsent(consent);
         } else {
-          developer.log(
-              'mellowtel: Parent widget providing context is not currently mounted');
+          throw (Exception(
+              '[Mellowtel]: Parent widget providing context is not currently mounted'));
         }
       }
-      await _webViewManager.initialize();
-      const version = '0.0.1';
 
-      // flutter-macos or flutter-windows
-      final platform = Platform.operatingSystem == 'macos'
-          ? 'flutter-macos'
-          : Platform.operatingSystem == 'windows'
-              ? 'flutter-windows'
-              : Platform.operatingSystem == 'ios'
-                  ? 'flutter-ios'
-                  : 'flutter';
-
-      final url =
-          'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$_nodeId&version=$version&platform=$platform';
-      _connectWebSocket(url);
+      if (consent) {
+        await _startScraping();
+      }
     } catch (e) {
-      developer.log('mellowtel: $e');
+      developer.log('[Mellowtel]: $e');
     }
+  }
+
+  Future<void> showConsentSettingsPage(BuildContext context,
+      {required OnOptIn onOptIn, required OnOptOut onOptOut}) async {
+    final previousConsent = (await sharedPrefsService).getConsent();
+    if (context.mounted) {
+      final consent = await _showConsentDialog(
+        context,
+        appName: appName,
+        appIcon: appIcon,
+        incentive: incentive,
+        yesText: yesText,
+      );
+      if (consent != previousConsent) {
+        if (!consent) {
+          onOptOut();
+          // consent is revoked. stop scraping.
+          await stop();
+        } else {
+          onOptIn();
+          await _startScraping();
+        }
+        await (await sharedPrefsService).setConsent(consent);
+      }
+    }
+  }
+
+  Future<void> optIn() async {
+    final previousConsent = (await sharedPrefsService).getConsent();
+    if (previousConsent == null || !previousConsent) {
+      await (await sharedPrefsService).setConsent(true);
+      await _startScraping();
+    }
+  }
+
+  Future<void> optOut() async {
+    final previousConsent = (await sharedPrefsService).getConsent();
+    if (previousConsent != null && previousConsent) {
+      await (await sharedPrefsService).setConsent(false);
+      await stop();
+    }
+  }
+
+  /// Stops the crawling process by closing the WebSocket connection.
+  ///
+  /// This method closes the WebSocket connection and disposes of the  WebView.
+  Future<void> stop() async {
+    await _channel?.sink.close();
+    await _webViewManager.dispose();
+    _channel = null;
+  }
+
+  /// To check user's consent
+  Future<bool?> checkConsent() async {
+    return LocalSharedPrefsService(await SharedPreferences.getInstance())
+        .getConsent();
+  }
+
+  Future<void> _startScraping() async {
+    await _webViewManager.initialize();
+    const version = '0.0.1';
+
+    // flutter-macos or flutter-windows
+    final platform = Platform.operatingSystem == 'macos'
+        ? 'flutter-macos'
+        : Platform.operatingSystem == 'windows'
+            ? 'flutter-windows'
+            : Platform.operatingSystem == 'ios'
+                ? 'flutter-ios'
+                : 'flutter';
+
+    final url =
+        'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$_nodeId&version=$version&platform=$platform';
+    _connectWebSocket(url);
   }
 
   void _connectWebSocket(String url) {
@@ -162,21 +227,6 @@ class Mellowtel {
     } else {
       developer.log('Max reconnection attempts reached. Giving up.');
     }
-  }
-
-  /// Stops the crawling process by closing the WebSocket connection.
-  ///
-  /// This method closes the WebSocket connection and disposes of the  WebView.
-  Future<void> stop() async {
-    await _channel?.sink.close();
-    await _webViewManager.dispose();
-    _channel = null;
-  }
-
-  /// To check user's consent
-  Future<bool?> checkConsent() async {
-    return LocalSharedPrefsService(await SharedPreferences.getInstance())
-        .getConsent();
   }
 
   Future<bool> _showConsentDialog(
