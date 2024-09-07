@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:mellowtel/src/exceptions.dart';
 import 'package:mellowtel/src/model/scrape_request.dart';
