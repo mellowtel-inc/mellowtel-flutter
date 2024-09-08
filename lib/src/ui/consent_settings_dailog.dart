@@ -150,11 +150,11 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
   String _getInformationText() {
     switch (_state) {
       case ContainerState.optedIn:
-        return "Mellowtel is an open-source library that lets you share your unused internet with trusted Al labs & startups who use it to train their models. The developer of this extension gets a small share of the revenue. It helps maintain this extension free and available. Mellowtel shares your bandwidth only. Security and privacy are 100% guaranteed. It doesn't collect, share, or sell personal information (not even anonymized data).";
+        return "Mellowtel is an open-source library that lets you share your unused internet with trusted Al labs & startups who use it to train their models. The developer of this app gets a small share of the revenue. It helps maintain this app free and available. Mellowtel shares your bandwidth only. Security and privacy are 100% guaranteed. It doesn't collect, share, or sell personal information (not even anonymized data).";
       case ContainerState.optedOut:
         return 'You are currently opted out. Your device\'s resources are not being used.';
       case ContainerState.confirmOptOut:
-        return 'Mellowtel is used by hundreds of thousands of users around the world. By remaining opted in, you will join this growing network of users. Security, privacy and speed of browsing are 100% guaranteed.\n\nOpting-out might negatively affect the quality of the service offered by this extension. Please consider opting-in to help keep this extension free and available.';
+        return 'Mellowtel is used by hundreds of thousands of users around the world. By remaining opted in, you will join this growing network of users. Security, privacy and speed of browsing are 100% guaranteed.\n\nOpting-out might negatively affect the quality of the service offered by this app. Please consider opting-in to help keep this app free and available.';
     }
   }
 
