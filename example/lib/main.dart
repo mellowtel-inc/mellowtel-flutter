@@ -77,19 +77,28 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
           Center(
             child: ElevatedButton(
               onPressed: () async {
-                await mellowtel.start(context,
-                    showDefaultConsentDialog: true, onOptIn: () {}, onOptOut: () {
-                  // TODO: Handle what happens if consent is denied.
-                  // Restrict users from using X services.
-
-                  // You have the option to ask user to change consent preference
-                  // await mellowtel.start(context, resetConsent: true)
-
-                  // You can also check the consent status at any time with
-                  // await mellowtel.checkConsent();
+                await mellowtel.start(context, showDefaultConsentDialog: true,
+                    onOptIn: () async {
+                  // Handle enabling services when consent is provided.
+                }, onOptOut: () async {
+                  // Handle disabling services if consent is denied.
                 });
               },
               child: const Text('Start'),
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                await mellowtel.showConsentSettingsPage(context,
+                    onOptIn: () async {
+                  // Handle enabling services when consent is provided.
+                }, onOptOut: () async {
+                  // Handle disabling services if consent is denied.
+                });
+              },
+              child: const Text('Settings'),
             ),
           ),
           const SizedBox(height: 16.0),

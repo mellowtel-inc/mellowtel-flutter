@@ -10,6 +10,7 @@ import 'package:mellowtel/src/services/dynamo_service.dart';
 import 'package:mellowtel/src/services/local_shared_prefs_service.dart';
 import 'package:mellowtel/src/services/s3_service.dart';
 import 'package:mellowtel/src/ui/consent_dialog.dart';
+import 'package:mellowtel/src/ui/consent_settings_dailog.dart';
 import 'package:mellowtel/src/webview/macos_webview_manager.dart';
 import 'package:mellowtel/src/webview/webview_manager.dart';
 import 'package:mellowtel/src/webview/windows_webview_manager.dart';
@@ -96,6 +97,7 @@ class Mellowtel {
       bool showDefaultConsentDialog = true}) async {
     try {
       await stop();
+     
       bool? consent = (await sharedPrefsService).getConsent();
       if (consent == null) {
         if (!showDefaultConsentDialog) {
@@ -110,7 +112,7 @@ class Mellowtel {
             incentive: incentive,
             yesText: yesText,
           );
-          consent ? onOptIn() : onOptOut();
+          consent ? await onOptIn() : await onOptOut();
 
           await (await sharedPrefsService).setConsent(consent);
         } else {
@@ -131,24 +133,18 @@ class Mellowtel {
       {required OnOptIn onOptIn, required OnOptOut onOptOut}) async {
     final previousConsent = (await sharedPrefsService).getConsent();
     if (context.mounted) {
-      final consent = await _showConsentDialog(
-        context,
-        appName: appName,
-        appIcon: appIcon,
-        incentive: incentive,
-        yesText: yesText,
-      );
-      if (consent != previousConsent) {
-        if (!consent) {
-          onOptOut();
-          // consent is revoked. stop scraping.
-          await stop();
-        } else {
-          onOptIn();
-          await _startScraping();
-        }
-        await (await sharedPrefsService).setConsent(consent);
-      }
+      await _showConsentSettingsDialog(context,
+          appName: appName,
+          appIcon: appIcon,
+          consent: previousConsent ?? false, onOptIn: () async {
+        await (await sharedPrefsService).setConsent(true);
+        await _startScraping();
+        await onOptIn();
+      }, onOptOut: () async {
+        await (await sharedPrefsService).setConsent(false);
+        await stop();
+        await onOptOut();
+      });
     }
   }
 
@@ -185,7 +181,7 @@ class Mellowtel {
 
   Future<void> _startScraping() async {
     await _webViewManager.initialize();
-    const version = '0.0.1';
+    const version = '0.0.3';
 
     // flutter-macos or flutter-windows
     final platform = Platform.operatingSystem == 'macos'
@@ -256,6 +252,37 @@ class Mellowtel {
     ).then((value) {
       final bool? consent = value as bool?;
       completer.complete(consent ?? false);
+    });
+
+    return completer.future;
+  }
+
+  Future<void> _showConsentSettingsDialog(BuildContext context,
+      {required String appName,
+      required String appIcon,
+      required OnOptIn onOptIn,
+      required OnOptOut onOptOut,
+      required bool consent}) async {
+    Completer<void> completer = Completer();
+    showDialog(
+      context: context,
+      barrierColor: Colors.black12.withOpacity(0.6), // Background color
+      barrierDismissible: false,
+
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: ConsentSettingsDialog(
+            appName: appName,
+            asset: appIcon,
+            initiallyOptedIn: consent,
+            onOptIn: onOptIn,
+            onOptOut: onOptOut,
+          ),
+        );
+      },
+    ).then((value) {
+      completer.complete();
     });
 
     return completer.future;
