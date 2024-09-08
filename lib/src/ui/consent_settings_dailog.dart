@@ -16,13 +16,13 @@ class ConsentSettingsDialog extends StatefulWidget {
   final OnOptOut onOptOut;
 
   const ConsentSettingsDialog({
-    super.key,
+    Key? key,
     required this.appName,
     required this.asset,
     required this.initiallyOptedIn,
     required this.onOptIn,
     required this.onOptOut,
-  });
+  }): super(key: key);
 
   @override
   ConsentSettingsDialogState createState() => ConsentSettingsDialogState();
@@ -219,8 +219,8 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  onSurface: Theme.of(context).primaryColor,
+                  primary: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 16.0,
@@ -257,8 +257,8 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  onSurface: Theme.of(context).primaryColor,
+                  primary: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 16.0,
@@ -294,8 +294,8 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  onSurface: Theme.of(context).primaryColor,
+                  primary: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 16.0,
