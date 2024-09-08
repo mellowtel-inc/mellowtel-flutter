@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'storage_service.dart';
-import 'dart:developer' as developer;
 
 class CustomHttpClient extends http.BaseClient {
   final http.Client _inner = http.Client();
@@ -19,7 +18,6 @@ class CustomHttpClient extends http.BaseClient {
 }
 
 class S3Service implements StorageService {
-  // TODO: Should come from constants file
   final String _getS3SignedUrlsUrl =
       'https://5xub3rkd3rqg6ebumgrvkjrm6u0jgqnw.lambda-url.us-east-1.on.aws/';
 

@@ -45,25 +45,33 @@ final Mellowtel mellowtel = Mellowtel(
 Use the `start()` method to initiate the scraping process.
 
 ```dart
-await mellowtel.start(context,
-      resetConsent: true, 
-      onOptIn: () {
-        //TODO: Enable user's incentives if they have opted in.
+await mellowtel.start(
+      context, 
+      showDefaultConsentDialog: true,
+      onOptIn: () async {
+        // Handle enabling services when consent is provided.
       }, 
-      onOptOut: () {
-        // TODO: Handle what happens if consent is denied.
-
-        // You have the option to ask user to change consent preference
-        // await mellowtel.start(context, resetConsent: true)
-
-        // You can also check the consent status at any time with
-        // await mellowtel.checkConsent();
+      onOptOut: () async {
+        // Handle disabling services if consent is denied.
   });
 ```
 
 This will open up a one-time consent popup for the user to accept.
 
 <img src = 'assets/consent-popup.png' width = 300px></img>
+
+Later, you may also provide an option for user to update their consent.
+
+```dart
+await mellowtel.showConsentSettingsPage(
+    context,
+    onOptIn: () async {
+      // Handle enabling services when consent is provided.
+    }, 
+    onOptOut: () async {
+      // Handle disabling services if consent is denied.
+  });
+```
 
 ### 3. Stop the Scraping Process
 
@@ -72,6 +80,8 @@ To terminate the scraping process, call the `stop()` method.
 ```dart
 await mellowtel.stop();
 ```
+
+
 
 ## Platform Support
 
