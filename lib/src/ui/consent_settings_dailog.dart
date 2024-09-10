@@ -205,18 +205,18 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop(); // Retu
+                  setState(() {
+                    _state = ContainerState.confirmOptOut;
+                  });
                 },
-                child: const Text('Close'),
+                child: const Text('Opt Out'),
               ),
             ),
             const SizedBox(width: 8.0),
             Expanded(
               child: ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    _state = ContainerState.confirmOptOut;
-                  });
+                  Navigator.of(context).pop(); // Retu
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
@@ -226,7 +226,7 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                     vertical: 16.0,
                   ),
                 ),
-                child: const Text("Opt Out"),
+                child: const Text("Close"),
               ),
             ),
           ],
@@ -253,7 +253,7 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
               child: ElevatedButton(
                 onPressed: () async {
                   await widget.onOptIn();
-                 
+
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -280,17 +280,17 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                     vertical: 16.0,
                   ),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
+                onPressed: () async {
+                  await widget.onOptOut();
+                  Navigator.pop(context);
                 },
-                child: const Text('Close'),
+                child: const Text("I'm sure"),
               ),
             ),
             const SizedBox(width: 8.0),
             Expanded(
               child: ElevatedButton(
-                onPressed: () async {
-                  await widget.onOptOut();
+                onPressed: () {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -301,7 +301,7 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                     vertical: 16.0,
                   ),
                 ),
-                child: const Text("I'm sure"),
+                child: const Text("Close"),
               ),
             ),
           ],
