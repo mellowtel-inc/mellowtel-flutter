@@ -35,7 +35,7 @@ class ConsentDialog extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildInformationWidget(context),
-                        SizedBox(height: 20.0),
+                        const SizedBox(height: 20.0),
                         Center(child: _buildActions(context)),
                       ],
                     ),
@@ -135,7 +135,7 @@ class ConsentDialog extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 24.0),
+          const SizedBox(height: 24.0),
           Row(
             children: [
               Expanded(
@@ -150,7 +150,7 @@ class ConsentDialog extends StatelessWidget {
                     Navigator.of(context)
                         .pop(false); // Returns false on decline
                   },
-                  child: Text('No'),
+                  child: const Text('No'),
                 ),
               ),
               const SizedBox(width: 8.0),

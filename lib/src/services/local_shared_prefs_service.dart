@@ -5,7 +5,7 @@ class LocalSharedPrefsService {
 
   LocalSharedPrefsService(this._sharedPreferences);
 
-  setConsent(bool value) async {
+  Future<void> setConsent(bool value) async {
     _sharedPreferences.setBool('consent', value);
   }
 
