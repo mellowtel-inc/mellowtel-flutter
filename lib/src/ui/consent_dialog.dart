@@ -26,49 +26,49 @@ class ConsentDialog extends StatelessWidget {
         child: Container(
           child: !isLandscape || isDesktop
               ? Padding(
-                  padding: const EdgeInsets.symmetric(
-                      // vertical: 8.0,
-                      ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInformationWidget(context),
-                        const SizedBox(height: 20.0),
-                        Center(child: _buildActions(context)),
-                      ],
-                    ),
-                  ),
-                )
+            padding: const EdgeInsets.symmetric(
+              // vertical: 8.0,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInformationWidget(context),
+                  const SizedBox(height: 20.0),
+                  Center(child: _buildActions(context)),
+                ],
+              ),
+            ),
+          )
               : Padding(
-                  padding: const EdgeInsets.symmetric(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                          ),
-                          child: SingleChildScrollView(
-                              child: _buildInformationWidget(context)),
-                        ),
-                      ),
-                      Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                          ),
-                          child: _buildActions(context),
-                        ),
-                      ),
-                    ],
+            padding: const EdgeInsets.symmetric(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                    ),
+                    child: SingleChildScrollView(
+                        child: _buildInformationWidget(context)),
                   ),
                 ),
+                Flexible(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                    ),
+                    child: _buildActions(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -83,7 +83,7 @@ class ConsentDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
+          /*Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -134,8 +134,8 @@ class ConsentDialog extends StatelessWidget {
                 ],
               ),
             ],
-          ),
-          const SizedBox(height: 24.0),
+          ),*/
+          const SizedBox(height: 20.0),
           Row(
             children: [
               Expanded(
@@ -150,7 +150,7 @@ class ConsentDialog extends StatelessWidget {
                     Navigator.of(context)
                         .pop(false); // Returns false on decline
                   },
-                  child: const Text('No'),
+                  child: const Text('Declina'),
                 ),
               ),
               const SizedBox(width: 8.0),
@@ -168,7 +168,7 @@ class ConsentDialog extends StatelessWidget {
                       vertical: 16.0,
                     ),
                   ),
-                  child: Text("Yes $yesText"),
+                  child: Text("$yesText"),
                 ),
               ),
             ],
@@ -177,7 +177,7 @@ class ConsentDialog extends StatelessWidget {
           Center(
             child: GestureDetector(
               onTap: () async {
-                final url = Uri.parse('https://www.mellowtel.it/flutter/');
+                final url = Uri.parse('https://www.mellowtel.dev/mellowtel-privacy-policy/');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {
@@ -185,7 +185,7 @@ class ConsentDialog extends StatelessWidget {
                 }
               },
               child: Text(
-                'Read our Privacy Policy and End User License Agreement',
+                'Leggi la Privacy Policy',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(),
                 textAlign: TextAlign.center,
               ),
@@ -201,35 +201,35 @@ class ConsentDialog extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // App Icon
-        Align(
+        /*Align(
           alignment: Alignment.centerLeft,
           child: Image.asset(
             asset,
             height: 64,
             width: 64,
           ),
-        ),
+        ),*/
         const SizedBox(height: 16.0),
         Align(
           alignment: Alignment.topLeft,
           child: Text(
             appName,
             style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         const SizedBox(height: 16.0),
         Align(
           alignment: Alignment.center,
           child: Text(
-            '$incentive, allow mellowtel to use your device\'s free resources and IP address to download public web data from the internet while you are using $appName',
+            'Zecento include Mellowtel per mantenere il servizio gratuito.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
         const SizedBox(height: 16.0),
         Text(
-          'None of your personal information is collected, except your IP address.\n\nYour participation is totally optional and you may opt out at any time.',
+          'Cliccando su “Continua”, condividerai la banda internet inutilizzata che permette ai nostri partner di accedere al web. Parte dei loro ricavi va all’app per offrirti il servizio premium e mantenere il servizio gratuito.\n\nPuoi cambiare le tue impostazioni in qualsiasi momento dalla pagina ‘account’.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],

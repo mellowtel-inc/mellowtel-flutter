@@ -9,7 +9,7 @@ import 'package:mellowtel/src/services/dynamo_service.dart';
 import 'package:mellowtel/src/services/local_shared_prefs_service.dart';
 import 'package:mellowtel/src/services/s3_service.dart';
 import 'package:mellowtel/src/ui/consent_dialog.dart';
-import 'package:mellowtel/src/ui/consent_settings_dailog.dart';
+import 'package:mellowtel/src/ui/consent_settings_dialog.dart';
 import 'package:mellowtel/src/webview/macos_webview_manager.dart';
 import 'package:mellowtel/src/webview/webview_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
