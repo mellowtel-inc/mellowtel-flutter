@@ -69,6 +69,8 @@ class Mellowtel {
   final int _maxReconnectAttempts = 5;
   final Duration _initialReconnectDelay = const Duration(seconds: 1);
 
+  bool _initialized = false;
+
   /// Tests the crawling process with a given [request].
   ///
   /// This method initializes the WebView, sends the [request] as a message,
@@ -93,9 +95,8 @@ class Mellowtel {
       {required OnOptIn onOptIn,
       required OnOptOut onOptOut,
       bool showDefaultConsentDialog = true}) async {
+    if (_initialized) return;
     try {
-      await stop();
-
       bool? consent = (await sharedPrefsService).getConsent();
       if (consent == null) {
         if (!showDefaultConsentDialog) {
@@ -163,6 +164,7 @@ class Mellowtel {
     await _channel?.sink.close();
     await _webViewManager.dispose();
     _channel = null;
+    _initialized = false;
   }
 
   /// To check user's consent
@@ -173,6 +175,8 @@ class Mellowtel {
 
   Future<void> _startScraping() async {
     await _webViewManager.initialize();
+    _initialized = true;
+
     const version = '0.0.3';
 
     // flutter-macos or flutter-windows
