@@ -18,18 +18,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
+import 'package:mellowtel/src/utils/identity_helpers.dart'; // Import the identity helpers
 
 /// The `Mellowtel` class provides methods to manage web scraping tasks
 /// using WebView and WebSocket connections.
 class Mellowtel {
   /// Creates an instance of `Mellowtel`.
   ///
-  /// The [_nodeId] should be a constant specific to the device and is required to identify the node to receieve data from Mellowtel.
+  /// The [_configurationKey] should be a constant specific to the device and is required to identify the node to receieve data from Mellowtel.
   ///
   /// Optional callbacks [onScrapingResult], [onScrapingException], and
   /// [onStorageException] can be provided to handle respective events.
   Mellowtel(
-    this._nodeId, {
+    this._configurationKey, {
     this.onScrapingResult,
     this.onScrapingException,
     this.onStorageException,
@@ -46,7 +47,7 @@ class Mellowtel {
                 'Only Macos and Windows Platforms are supported.');
   }
 
-  final String _nodeId;
+  final String _configurationKey;
   final _storageService = S3Service();
 
   WebSocketChannel? _channel;
@@ -196,8 +197,11 @@ class Mellowtel {
                 ? 'flutter-ios'
                 : 'flutter';
 
+    // Generate the identifier using the node ID
+    final identifier = await getOrGenerateIdentifier(_configurationKey, (await sharedPrefsService));
+
     final url =
-        'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$_nodeId&version=$version&platform=$platform';
+        'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$identifier&version=$version&platform=$platform';
     _connectWebSocket(url);
   }
 
