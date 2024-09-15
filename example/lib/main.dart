@@ -76,13 +76,6 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Center(
-          //   child: SizedBox(
-          //     height: 50,
-          //     width: 50,
-          //     child: CircularProgressIndicator(),
-          //   ),
-          // ),
           Center(
             child: ElevatedButton(
               onPressed: () async {
