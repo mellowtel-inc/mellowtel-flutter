@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:mellowtel/mellowtel.dart';
 import 'package:html2md/html2md.dart' as html2md;
+import 'package:mellowtel/src/utils/frame_manager.dart';
 
 import 'webview_manager.dart';
 
@@ -58,6 +59,10 @@ class MacOSWebViewManager extends WebViewManager {
 
   Future<void> _loadUrlAndWait(String url, String? removeCSSselectors) async {
     _pageLoadCompleter = Completer<void>();
+    final Stopwatch stopwatch = Stopwatch()..start();
+    await FrameManager().waitForIdleFrames();
+    print("WAITED FOR MILLISECONDS: ${stopwatch.elapsedMilliseconds}");
+     stopwatch.stop();
     await _webViewController!.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
     await _pageLoadCompleter!.future;
     // Inject and execute JavaScript to remove selectors

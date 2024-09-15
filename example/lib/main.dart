@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:mellowtel/mellowtel.dart';
 
 void main() {
@@ -40,6 +41,7 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
 
   @override
   void initState() {
+    
     // TODO: Enable temporarily for debugging purposes to verify if the data is processed correctly
 
     // mellowtel.onScrapingResult = (result) {
@@ -74,13 +76,13 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: SizedBox(
-              height: 50,
-              width: 50,
-              child: CircularProgressIndicator(),
-            ),
-          ),
+          // Center(
+          //   child: SizedBox(
+          //     height: 50,
+          //     width: 50,
+          //     child: CircularProgressIndicator(),
+          //   ),
+          // ),
           Center(
             child: ElevatedButton(
               onPressed: () async {
