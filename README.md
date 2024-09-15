@@ -31,7 +31,7 @@ Start by creating an instance of `Mellowtel` with your unique node ID and detail
 import 'package:mellowtel/mellowtel.dart';
 
 final Mellowtel mellowtel = Mellowtel(
-    "123",
+    "123", // your designated configuration key
     appName: 'King Kong',
     appIcon: 'asset/logo.png',
     incentive:

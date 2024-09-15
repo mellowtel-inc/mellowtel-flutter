@@ -75,6 +75,13 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
+            child: SizedBox(
+              height: 50,
+              width: 50,
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          Center(
             child: ElevatedButton(
               onPressed: () async {
                 await mellowtel.start(context, showDefaultConsentDialog: true,
