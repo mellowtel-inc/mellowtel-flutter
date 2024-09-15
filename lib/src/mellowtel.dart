@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:mellowtel/src/exceptions.dart';
 import 'package:mellowtel/src/model/scrape_request.dart';
 import 'package:mellowtel/src/model/scrape_result.dart';
@@ -19,6 +18,7 @@ import 'dart:developer' as developer;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:mellowtel/src/utils/identity_helpers.dart'; // Import the identity helpers
+import 'package:connectivity_plus/connectivity_plus.dart'; // Import the connectivity_plus package
 
 /// The `Mellowtel` class provides methods to manage web scraping tasks
 /// using WebView and WebSocket connections.
@@ -57,6 +57,8 @@ class Mellowtel {
   Future<LocalSharedPrefsService> get sharedPrefsService async =>
       _sharedPrefsService ??
       LocalSharedPrefsService(await SharedPreferences.getInstance());
+
+  final Connectivity connectivity = Connectivity();
 
   OnScrapingResult? onScrapingResult;
   OnScrapingException? onScrapingException;
@@ -183,9 +185,8 @@ class Mellowtel {
   }
 
   Future<void> _startScraping() async {
-    await _webViewManager.initialize();
     _initialized = true;
-
+    await _webViewManager.initialize();
     const version = '0.0.3';
 
     // flutter-macos or flutter-windows
@@ -198,16 +199,24 @@ class Mellowtel {
                 : 'flutter';
 
     // Generate the identifier using the node ID
-    final identifier = await getOrGenerateIdentifier(_configurationKey, (await sharedPrefsService));
+    final identifier = await getOrGenerateIdentifier(
+        _configurationKey, (await sharedPrefsService));
 
     final url =
         'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$identifier&version=$version&platform=$platform';
-    _connectWebSocket(url);
+
+    // Check if the user is on Wi-Fi or Ethernet before connecting to WebSocket
+    final connectivityResult = await connectivity.checkConnectivity();
+    if (connectivityResult.contains(ConnectivityResult.wifi) ||
+        connectivityResult.contains(ConnectivityResult.ethernet)) {
+      _connectWebSocket(url);
+    } else {
+      developer.log('Not connected to Wi-Fi. WebSocket connection aborted.');
+    }
   }
 
   void _connectWebSocket(String url) {
     _channel = WebSocketChannel.connect(Uri.parse(url));
-
     _channel!.stream.listen((message) {
       _onMessage(message);
     }, onDone: () {
