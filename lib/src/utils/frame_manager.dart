@@ -2,44 +2,55 @@ import 'dart:async';
 import 'package:flutter/scheduler.dart';
 
 class FrameManager {
+  static final FrameManager _instance = FrameManager._internal();
   final Duration _maxWaitTime = const Duration(seconds: 5);
   final Duration _maximalBuildTime =
       const Duration(milliseconds: 11); // Example threshold
+  final Map<DateTime, FrameTiming> _frameTimings = {};
 
+  factory FrameManager() {
+    return _instance;
+  }
+
+  FrameManager._internal() {
+    SchedulerBinding.instance.addTimingsCallback(_frameCallback);
+  }
+
+  void _frameCallback(List<FrameTiming> timings) {
+    _frameTimings.clear();
+    final DateTime now = DateTime.now();
+    for (var timing in timings) {
+      _frameTimings[now] = timing;
+    }
+  }
+
+  /// This method evaluates the last batch of frames to decide the idle state of device.
+  /// 
+  /// Works most appropriately for release builds because of reporting time of roughly 1s.
   Future<void> waitForIdleFrames() async {
     final Completer<void> completer = Completer<void>();
     final Stopwatch stopwatch = Stopwatch()..start();
 
     while (true) {
-      Completer<bool> idleCheckerCompletor = Completer<bool>();
-      callback(data) => idleChecker(idleCheckerCompletor, data);
-
-      SchedulerBinding.instance.addTimingsCallback(callback);
-
-      final bool isIdle = await idleCheckerCompletor.future;
-
-      SchedulerBinding.instance.removeTimingsCallback(callback);
-
-      if (isIdle || stopwatch.elapsed >= _maxWaitTime) {
+      if (_isIdle() || stopwatch.elapsed >= _maxWaitTime) {
         completer.complete();
         break;
       }
+      await Future.delayed(
+          const Duration(milliseconds: 100)); // Polling interval
     }
 
     return completer.future;
   }
 
-  void idleChecker(Completer<bool> completor, List<FrameTiming> timings) {
-    print(timings);
-    if (timings.isEmpty) return completor.complete(true);
+  bool _isIdle() {
+    if (_frameTimings.isEmpty) return true;
 
-    // Return not idle if any frame took more time than the maximalBuildTime
-    for (var frame in timings) {
-      if (frame.rasterDuration > _maximalBuildTime) {
-        print("NOT TAKING");
-        return completor.complete(false);
+    for (var timing in _frameTimings.values) {
+      if (timing.rasterDuration > _maximalBuildTime) {
+        return false;
       }
     }
-    return completor.complete(true);
+    return true;
   }
 }
