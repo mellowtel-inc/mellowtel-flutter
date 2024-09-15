@@ -9,25 +9,28 @@ import 'package:mellowtel/src/services/dynamo_service.dart';
 import 'package:mellowtel/src/services/local_shared_prefs_service.dart';
 import 'package:mellowtel/src/services/s3_service.dart';
 import 'package:mellowtel/src/ui/consent_dialog.dart';
-import 'package:mellowtel/src/ui/consent_settings_dialog.dart';
+import 'package:mellowtel/src/ui/consent_settings_dailog.dart';
+import 'package:mellowtel/src/utils/frame_manager.dart';
 import 'package:mellowtel/src/webview/macos_webview_manager.dart';
 import 'package:mellowtel/src/webview/webview_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
+import 'package:mellowtel/src/utils/identity_helpers.dart'; // Import the identity helpers
+import 'package:connectivity_plus/connectivity_plus.dart'; // Import the connectivity_plus package
 
 /// The `Mellowtel` class provides methods to manage web scraping tasks
 /// using WebView and WebSocket connections.
 class Mellowtel {
   /// Creates an instance of `Mellowtel`.
   ///
-  /// The [_nodeId] should be a constant specific to the device and is required to identify the node to receieve data from Mellowtel.
+  /// The [_configurationKey] should be a constant specific to the device and is required to identify the node to receieve data from Mellowtel.
   ///
   /// Optional callbacks [onScrapingResult], [onScrapingException], and
   /// [onStorageException] can be provided to handle respective events.
   Mellowtel(
-    this._nodeId, {
+    this._configurationKey, {
     this.onScrapingResult,
     this.onScrapingException,
     this.onStorageException,
@@ -44,7 +47,7 @@ class Mellowtel {
                 'Only Macos and Windows Platforms are supported.');
   }
 
-  final String _nodeId;
+  final String _configurationKey;
   final _storageService = S3Service();
 
   WebSocketChannel? _channel;
@@ -54,6 +57,8 @@ class Mellowtel {
   Future<LocalSharedPrefsService> get sharedPrefsService async =>
       _sharedPrefsService ??
       LocalSharedPrefsService(await SharedPreferences.getInstance());
+
+  final Connectivity connectivity = Connectivity();
 
   OnScrapingResult? onScrapingResult;
   OnScrapingException? onScrapingException;
@@ -174,9 +179,8 @@ class Mellowtel {
   }
 
   Future<void> _startScraping() async {
-    await _webViewManager.initialize();
     _initialized = true;
-
+    await _webViewManager.initialize();
     const version = '0.0.3';
 
     // flutter-macos or flutter-windows
@@ -188,14 +192,25 @@ class Mellowtel {
                 ? 'flutter-ios'
                 : 'flutter';
 
+    // Generate the identifier using the node ID
+    final identifier = await getOrGenerateIdentifier(
+        _configurationKey, (await sharedPrefsService));
+
     final url =
-        'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$_nodeId&version=$version&platform=$platform';
-    _connectWebSocket(url);
+        'wss://7joy2r59rf.execute-api.us-east-1.amazonaws.com/production/?node_id=$identifier&version=$version&platform=$platform';
+
+    // Check if the user is on Wi-Fi or Ethernet before connecting to WebSocket
+    final connectivityResult = await connectivity.checkConnectivity();
+    if (connectivityResult.contains(ConnectivityResult.wifi) ||
+        connectivityResult.contains(ConnectivityResult.ethernet)) {
+      _connectWebSocket(url);
+    } else {
+      developer.log('Not connected to Wi-Fi. WebSocket connection aborted.');
+    }
   }
 
   void _connectWebSocket(String url) {
     _channel = WebSocketChannel.connect(Uri.parse(url));
-
     _channel!.stream.listen((message) {
       _onMessage(message);
     }, onDone: () {

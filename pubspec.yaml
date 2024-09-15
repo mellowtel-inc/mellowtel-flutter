@@ -18,6 +18,7 @@ dependencies:
   http: ^0.13.5
   shared_preferences:
   url_launcher: 
+  connectivity_plus: ^6.0.5
 
 dev_dependencies:
   flutter_test:
