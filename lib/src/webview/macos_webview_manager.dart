@@ -59,10 +59,7 @@ class MacOSWebViewManager extends WebViewManager {
 
   Future<void> _loadUrlAndWait(String url, String? removeCSSselectors) async {
     _pageLoadCompleter = Completer<void>();
-    final Stopwatch stopwatch = Stopwatch()..start();
     await FrameManager().waitForIdleFrames();
-    print("WAITED FOR MILLISECONDS: ${stopwatch.elapsedMilliseconds}");
-     stopwatch.stop();
     await _webViewController!.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
     await _pageLoadCompleter!.future;
     // Inject and execute JavaScript to remove selectors
