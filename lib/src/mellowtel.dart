@@ -213,7 +213,7 @@ class Mellowtel {
     final connectivityResult = await connectivity.checkConnectivity();
     if (connectivityResult.contains(ConnectivityResult.wifi) ||
         connectivityResult.contains(ConnectivityResult.ethernet)) {
-      _connectWebSocket(url, test: true);
+      _connectWebSocket(url);
     } else {
       developer.log('Not connected to Wi-Fi. WebSocket connection aborted.');
     }
