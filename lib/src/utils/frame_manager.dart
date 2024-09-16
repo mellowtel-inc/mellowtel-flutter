@@ -13,7 +13,7 @@ class FrameManager {
   }
 
   FrameManager._internal() {
-    SchedulerBinding.instance.addTimingsCallback(_frameCallback);
+    SchedulerBinding.instance?.addTimingsCallback(_frameCallback);
   }
 
   void _frameCallback(List<FrameTiming> timings) {

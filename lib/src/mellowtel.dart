@@ -9,7 +9,7 @@ import 'package:mellowtel/src/services/dynamo_service.dart';
 import 'package:mellowtel/src/services/local_shared_prefs_service.dart';
 import 'package:mellowtel/src/services/s3_service.dart';
 import 'package:mellowtel/src/ui/consent_dialog.dart';
-import 'package:mellowtel/src/ui/consent_settings_dailog.dart';
+import 'package:mellowtel/src/ui/consent_settings_dialog.dart';
 import 'package:mellowtel/src/utils/frame_manager.dart';
 import 'package:mellowtel/src/webview/macos_webview_manager.dart';
 import 'package:mellowtel/src/webview/webview_manager.dart';
@@ -201,8 +201,8 @@ class Mellowtel {
 
     // Check if the user is on Wi-Fi or Ethernet before connecting to WebSocket
     final connectivityResult = await connectivity.checkConnectivity();
-    if (connectivityResult.contains(ConnectivityResult.wifi) ||
-        connectivityResult.contains(ConnectivityResult.ethernet)) {
+    if (connectivityResult == ConnectivityResult.wifi ||
+        connectivityResult == ConnectivityResult.ethernet) {
       _connectWebSocket(url);
     } else {
       developer.log('Not connected to Wi-Fi. WebSocket connection aborted.');
