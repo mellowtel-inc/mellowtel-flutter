@@ -10,7 +10,7 @@ import 'package:mellowtel/src/services/local_shared_prefs_service.dart';
 import 'package:mellowtel/src/services/s3_service.dart';
 import 'package:mellowtel/src/ui/consent_dialog.dart';
 import 'package:mellowtel/src/ui/consent_settings_dialog.dart';
-import 'package:mellowtel/src/utils/frame_manager.dart';
+import 'package:mellowtel/src/utils/rate_limiter.dart';
 import 'package:mellowtel/src/webview/macos_webview_manager.dart';
 import 'package:mellowtel/src/webview/webview_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -75,6 +75,8 @@ class Mellowtel {
   final Duration _initialReconnectDelay = const Duration(seconds: 1);
 
   bool _initialized = false;
+
+  Timer? _fakeSocket;
 
   /// Tests the crawling process with a given [request].
   ///
@@ -166,6 +168,7 @@ class Mellowtel {
   ///
   /// This method closes the WebSocket connection and disposes of the  WebView.
   Future<void> stop() async {
+    _fakeSocket?.cancel();
     await _channel?.sink.close();
     await _webViewManager.dispose();
     _channel = null;
@@ -209,7 +212,23 @@ class Mellowtel {
     }
   }
 
-  void _connectWebSocket(String url) {
+  void _connectWebSocket(String url, {bool test = false}) {
+    if (test) {
+      _fakeSocket = Timer.periodic(const Duration(seconds: 4), (_) {
+        _onMessage(jsonEncode(ScrapeRequest(
+                recordID: '005ie7h3w5',
+                url: 'https://www.mellowtel.dev/',
+                waitBeforeScraping: 1,
+                saveHtml: true,
+                saveMarkdown: true,
+                htmlVisualizer: true,
+                orgId: 'mellowtel',
+                htmlTransformer: 'none',
+                removeCSSselectors: 'default')
+            .toJson()));
+      });
+      return;
+    }
     _channel = WebSocketChannel.connect(Uri.parse(url));
     _channel!.stream.listen((message) {
       _onMessage(message);
@@ -307,10 +326,27 @@ class Mellowtel {
   ///
   /// [message] - The incoming message to be processed.
   Future<void> _onMessage(dynamic message) async {
+    final prefs = await SharedPreferences.getInstance();
+    final rateLimiter = RateLimiter(prefs);
+
+    if (await rateLimiter.getIfDailyRateLimitReached()) {
+      developer.log('Mellowtel: Daily rate limit reached. Closing WebSocket connection.');
+      await stop();
+      return;
+    }
+
+    if (await rateLimiter.getIfMinuteRateLimitReached()) {
+      developer.log('Mellowtel: Per-minute rate limit reached. Skipping request.');
+      return;
+    }
+
     try {
       final data = jsonDecode(message);
       final url = data['url'];
       if (url != null) {
+        // Increase rate limit prior only so more requests aren't queued.
+        await rateLimiter.increment();
+      
         ScrapeRequest scrapeRequest = ScrapeRequest.fromJson(data);
         ScrapeResult scrapeResult = await _runScrapeRequest(scrapeRequest);
         final UploadResult uploadResult = await _postScrapeRequest(scrapeResult,
