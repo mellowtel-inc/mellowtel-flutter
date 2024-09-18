@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:mellowtel/mellowtel.dart';
 import 'package:html2md/html2md.dart' as html2md;
@@ -41,7 +41,7 @@ class MacOSWebViewManager extends WebViewManager {
     final result = await _webViewController!
         .evaluateJavascript(source: 'document.documentElement.outerHTML');
     final html = result?.toString() ?? '';
-    final markdown = _convertHtmlToMarkdown(html);
+    final markdown = await _convertHtmlToMarkdown(html);
     Uint8List? screenshot;
     if (request.htmlVisualizer ?? false) {
       screenshot = await _webViewController!.takeScreenshot();
@@ -94,14 +94,19 @@ class MacOSWebViewManager extends WebViewManager {
     }
   }
 
-  String _convertHtmlToMarkdown(String html) {
-    return html2md.convert(html);
-  }
-
   @override
   Future<void> dispose() async {
     await _headlessWebView?.dispose();
     _headlessWebView = null;
     _webViewController = null;
   }
+}
+
+// Top-level function to be run in an isolate
+String _convertHtmlToMarkdownInIsolate(String html) {
+  return html2md.convert(html);
+}
+
+Future<String> _convertHtmlToMarkdown(String html) async {
+  return await compute(_convertHtmlToMarkdownInIsolate, html);
 }
