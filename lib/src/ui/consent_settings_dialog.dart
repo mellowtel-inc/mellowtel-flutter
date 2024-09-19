@@ -14,6 +14,7 @@ class ConsentSettingsDialog extends StatefulWidget {
   final bool initiallyOptedIn;
   final OnOptIn onOptIn;
   final OnOptOut onOptOut;
+  final String nodeId;
 
   const ConsentSettingsDialog({
     Key? key,
@@ -22,6 +23,7 @@ class ConsentSettingsDialog extends StatefulWidget {
     required this.initiallyOptedIn,
     required this.onOptIn,
     required this.onOptOut,
+    required this.nodeId,
   }) : super(key: key);
 
   @override
@@ -133,6 +135,15 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                   )
                 ],
                 style: Theme.of(context).textTheme.bodyMedium),
+          ),
+        ),
+        const SizedBox(height: 4.0),
+        if(_state!=ContainerState.optedOut)
+        Align(
+          alignment: Alignment.topLeft,
+          child: Text(
+            "Node ID: ${widget.nodeId}",
+            style: Theme.of(context).textTheme.labelSmall,
           ),
         ),
         const SizedBox(height: 16.0),
