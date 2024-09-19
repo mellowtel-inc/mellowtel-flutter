@@ -139,6 +139,8 @@ class Mellowtel {
   Future<void> showConsentSettingsPage(BuildContext context,
       {required OnOptIn onOptIn, required OnOptOut onOptOut}) async {
     final previousConsent = (await sharedPrefsService).getConsent();
+    final nodeId = await getOrGenerateIdentifier(
+        _configurationKey, (await sharedPrefsService));
     if (context.mounted) {
       await _showConsentSettingsDialog(context,
           appName: appName,
@@ -151,7 +153,7 @@ class Mellowtel {
         await (await sharedPrefsService).setConsent(false);
         await stop();
         await onOptOut();
-      });
+      }, nodeId: nodeId);
     }
   }
 
@@ -299,7 +301,8 @@ class Mellowtel {
       required String appIcon,
       required OnOptIn onOptIn,
       required OnOptOut onOptOut,
-      required bool consent}) async {
+      required bool consent,
+      required String nodeId}) async {
     Completer<void> completer = Completer();
     showDialog(
       context: context,
@@ -315,6 +318,7 @@ class Mellowtel {
             initiallyOptedIn: consent,
             onOptIn: onOptIn,
             onOptOut: onOptOut,
+            nodeId: nodeId,
           ),
         );
       },
@@ -337,13 +341,15 @@ class Mellowtel {
     final rateLimiter = RateLimiter(prefs);
 
     if (await rateLimiter.getIfDailyRateLimitReached()) {
-      developer.log('Mellowtel: Daily rate limit reached. Closing WebSocket connection.');
+      developer.log(
+          'Mellowtel: Daily rate limit reached. Closing WebSocket connection.');
       await stop();
       return;
     }
 
     if (await rateLimiter.getIfMinuteRateLimitReached()) {
-      developer.log('Mellowtel: Per-minute rate limit reached. Skipping request.');
+      developer
+          .log('Mellowtel: Per-minute rate limit reached. Skipping request.');
       return;
     }
 
@@ -353,7 +359,7 @@ class Mellowtel {
       if (url != null) {
         // Increase rate limit prior only so more requests aren't queued.
         await rateLimiter.increment();
-      
+
         ScrapeRequest scrapeRequest = ScrapeRequest.fromJson(data);
         ScrapeResult scrapeResult = await _runScrapeRequest(scrapeRequest);
         final UploadResult uploadResult = await _postScrapeRequest(scrapeResult,
