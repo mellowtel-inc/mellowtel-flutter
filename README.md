@@ -8,30 +8,25 @@ With Mellowtel's Open-Source library, your users can share a fraction of their u
 
 ## Installation
 
-Add `mellowtel` to your `pubspec.yaml`:
+Add `mellowtel` to your pubspec:
 
 ```yaml
-dependencies:
-  mellowtel:
-    git:
-      url: <provided in email>
+flutter pub add mellowtel
 ```
 
-Run `flutter pub get` to install the package.
-
-When running on macos, please [configure the macOS App Sandbox](https://inappwebview.dev/docs/intro#setup-macos).
+When running on macos, please [configure the macOS App Sandbox](https://inappwebview.dev/docs/intro#setup-macos) by providing network permissions.
 
 ## Usage
 
 ### 1. Initialize `Mellowtel`
 
-Start by creating an instance of `Mellowtel` with your unique node ID and details for the user consent popup. 
+Start by creating an instance of `Mellowtel` with your unique configuration key and details for the user consent popup. 
 
 ```dart
 import 'package:mellowtel/mellowtel.dart';
 
 final Mellowtel mellowtel = Mellowtel(
-    "123", // your designated configuration key
+    "123", // your designated configuration key as received in email
     appName: 'King Kong',
     appIcon: 'asset/logo.png',
     incentive:
@@ -46,8 +41,7 @@ Use the `start()` method to initiate the scraping process.
 
 ```dart
 await mellowtel.start(
-      context, 
-      showDefaultConsentDialog: true,
+      context,
       onOptIn: () async {
         // Handle enabling services when consent is provided.
       }, 
@@ -60,7 +54,7 @@ This will open up a one-time consent popup for the user to accept.
 
 <img src = 'assets/consent-popup.png' width = 300px></img>
 
-Later, you may also provide an option for user to update their consent.
+Later, you may also provide an option for user to update their consent within the settings page.
 
 ```dart
 await mellowtel.showConsentSettingsPage(
@@ -73,16 +67,8 @@ await mellowtel.showConsentSettingsPage(
   });
 ```
 
-### 3. Stop the Scraping Process
-
-To terminate the scraping process, call the `stop()` method.
-
-```dart
-await mellowtel.stop();
-```
-
-
-
 ## Platform Support
 
 This package supports iOS, macos and windows platforms. Android and web are not supported.
+
+Please report any errors in the [github issues](https://github.com/mellowtel-inc/mellowtel-flutter/issues).

@@ -193,7 +193,7 @@ class Mellowtel {
   Future<void> _startScraping() async {
     _initialized = true;
     await _webViewManager.initialize();
-    const version = '0.0.3';
+    const version = '0.0.1';
 
     // flutter-macos or flutter-windows
     final platform = Platform.operatingSystem == 'macos'

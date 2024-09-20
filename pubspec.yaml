@@ -1,11 +1,18 @@
 name: mellowtel
 description: "With Mellowtel, your users can share a fraction of their unused internet by using a transparent opt-in/out mechanism. Trusted partners access the internet through this network, and you get paid for it."
-version: 0.0.3
-# homepage:
+version: 0.0.1
+homepage: https://www.mellowtel.dev/flutter/
+repository: https://github.com/mellowtel-inc/mellowtel-flutter
+issue_tracker: https://github.com/mellowtel-inc/mellowtel-flutter/issues
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
   flutter: ">=3.16.0"
+
+platforms:
+  ios:
+  macos:
+  windows:
 
 dependencies:
   flutter:
@@ -26,6 +33,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^3.0.0
   test:
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
