@@ -11,6 +11,7 @@ import 'package:mellowtel/src/services/s3_service.dart';
 import 'package:mellowtel/src/ui/consent_dialog.dart';
 import 'package:mellowtel/src/ui/consent_settings_dailog.dart';
 import 'package:mellowtel/src/utils/rate_limiter.dart';
+import 'package:mellowtel/src/utils/bandwidth_limiter.dart';
 import 'package:mellowtel/src/webview/macos_webview_manager.dart';
 import 'package:mellowtel/src/webview/webview_manager.dart';
 import 'package:mellowtel/src/webview/windows_webview_manager.dart';
@@ -129,6 +130,7 @@ class Mellowtel {
       }
 
       if (consent) {
+        await BandwidthLimiter(await SharedPreferences.getInstance()).resetScrapeTimes();
         await _startScraping();
       }
     } catch (e) {
@@ -223,7 +225,7 @@ class Mellowtel {
 
   void _connectWebSocket(String url, {bool test = false}) {
     if (test) {
-      _fakeSocket = Timer.periodic(const Duration(seconds: 4), (_) {
+      _fakeSocket = Timer.periodic(const Duration(seconds: 10), (_) {
         _onMessage(jsonEncode(ScrapeRequest(
                 recordID: '005ie7h3w5',
                 url: 'https://www.mellowtel.dev/',
@@ -339,6 +341,14 @@ class Mellowtel {
   Future<void> _onMessage(dynamic message) async {
     final prefs = await SharedPreferences.getInstance();
     final rateLimiter = RateLimiter(prefs);
+    final bandwidthLimiter = BandwidthLimiter(prefs);
+
+    if (await bandwidthLimiter.shouldDisconnect()) {
+      developer.log(
+          'Mellowtel: Average scrape time exceeded limit. Closing WebSocket connection.');
+      await stop();
+      return;
+    }
 
     if (await rateLimiter.getIfDailyRateLimitReached()) {
       developer.log(
@@ -361,7 +371,11 @@ class Mellowtel {
         await rateLimiter.increment();
 
         ScrapeRequest scrapeRequest = ScrapeRequest.fromJson(data);
+
+        final stopwatch = Stopwatch()..start();
         ScrapeResult scrapeResult = await _runScrapeRequest(scrapeRequest);
+        await bandwidthLimiter.addScrapeTime(stopwatch);
+
         final UploadResult uploadResult = await _postScrapeRequest(scrapeResult,
             url: scrapeRequest.url,
             htmlTransformer: scrapeRequest.htmlTransformer);
