@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:mellowtel/mellowtel.dart';
 import 'package:html2md/html2md.dart' as html2md;
+import 'package:mellowtel/src/utils/log.dart';
 import 'package:webview_windows/webview_windows.dart' as windows_webview;
 
 import 'webview_manager.dart';
@@ -12,7 +13,7 @@ class WindowsWebViewManager extends WebViewManager {
 
   @override
   Future<void> initialize() async {
-    developer.log("Mellowtel: Initializing Windows WebView");
+    logMellowtel("Mellowtel: Initializing Windows WebView");
     _webViewController = windows_webview.WebviewController();
     await _webViewController!.initialize();
   }
@@ -58,7 +59,7 @@ class WindowsWebViewManager extends WebViewManager {
         'finalUrl': finalUrl,
       };
     } catch (e) {
-      developer.log(e.toString());
+      logMellowtel(e.toString());
       throw Exception('Error crawling webpage');
     }
   }
