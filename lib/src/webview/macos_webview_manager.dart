@@ -16,18 +16,14 @@ class MacOSWebViewManager extends WebViewManager {
 
   @override
   Future<void> initialize() async {
-    PlatformInAppWebViewController.debugLoggingSettings.enabled =
-        loggingEnabled;
-    _headlessWebView = HeadlessInAppWebView(
-      onWebViewCreated: (controller) {
-        logMellowtel("MellowTel: Webview created!");
-        _webViewController = controller;
-      },
-      onLoadStop: (controller, url) async {
-        _pageLoadCompleter?.complete();
-      },
-      onProgressChanged: (_, int x) {},
-    );
+    PlatformInAppWebViewController.debugLoggingSettings.enabled = loggingEnabled;
+    _headlessWebView = HeadlessInAppWebView(onWebViewCreated: (controller) {
+      logMellowtel("MellowTel: Webview created!");
+      _webViewController = controller;
+    }, onLoadStop: (controller, url) async {
+      _pageLoadCompleter?.complete();
+    }, onProgressChanged: (_, int x) {
+    }, );
 
     await _headlessWebView!.run();
   }
@@ -98,32 +94,32 @@ class MacOSWebViewManager extends WebViewManager {
     }
   }
 
-  Future<void> _performActions(List<Map<String, dynamic>> actions) async {
-    if (_webViewController == null) return;
+Future<void> _performActions(List<Map<String, dynamic>> actions) async {
+  if (_webViewController == null) return;
 
-    for (var action in actions) {
-      if (action.containsKey("scroll_y")) {
-        int scrollY = action["scroll_y"];
-        await _webViewController!.evaluateJavascript(
-          source: "window.scrollBy(0, $scrollY);",
-        );
-      } else if (action.containsKey("scroll_x")) {
-        int scrollX = action["scroll_x"];
-        await _webViewController!.evaluateJavascript(
-          source: "window.scrollBy($scrollX, 0);",
-        );
-      } else if (action.containsKey("wait")) {
-        int waitTime = action["wait"];
-        await Future.delayed(Duration(milliseconds: waitTime));
-      } else if (action.containsKey("click")) {
-        String selector = action["click"];
-        await _webViewController!.evaluateJavascript(
-          source: "document.querySelector('$selector').click();",
-        );
-      } else if (action.containsKey("wait_for")) {
-        String selector = action["wait_for"];
-        await _webViewController!.evaluateJavascript(
-          source: """
+  for (var action in actions) {
+    if (action.containsKey("scroll_y")) {
+      int scrollY = action["scroll_y"];
+      await _webViewController!.evaluateJavascript(
+        source: "window.scrollBy(0, $scrollY);",
+      );
+    } else if (action.containsKey("scroll_x")) {
+      int scrollX = action["scroll_x"];
+      await _webViewController!.evaluateJavascript(
+        source: "window.scrollBy($scrollX, 0);",
+      );
+    } else if (action.containsKey("wait")) {
+      int waitTime = action["wait"];
+      await Future.delayed(Duration(milliseconds: waitTime));
+    } else if (action.containsKey("click")) {
+      String selector = action["click"];
+      await _webViewController!.evaluateJavascript(
+        source: "document.querySelector('$selector').click();",
+      );
+    } else if (action.containsKey("wait_for")) {
+      String selector = action["wait_for"];
+      await _webViewController!.evaluateJavascript(
+        source: """
         (function() {
           return new Promise((resolve) => {
             const observer = new MutationObserver((mutations, obs) => {
@@ -136,11 +132,11 @@ class MacOSWebViewManager extends WebViewManager {
           });
         })();
         """,
-        );
-      } else if (action.containsKey("wait_for_and_click")) {
-        String selector = action["wait_for_and_click"];
-        await _webViewController!.evaluateJavascript(
-          source: """
+      );
+    } else if (action.containsKey("wait_for_and_click")) {
+      String selector = action["wait_for_and_click"];
+      await _webViewController!.evaluateJavascript(
+        source: """
         (function() {
           return new Promise((resolve) => {
             const observer = new MutationObserver((mutations, obs) => {
@@ -154,37 +150,36 @@ class MacOSWebViewManager extends WebViewManager {
           });
         })();
         """,
+      );
+    } else if (action.containsKey("fill_form")) {
+      Map<String, String> formFields = Map<String, String>.from(action["fill_form"]);
+      for (var field in formFields.entries) {
+        await _webViewController!.evaluateJavascript(
+          source: "document.querySelector('${field.key}').value = '${field.value}';",
         );
-      } else if (action.containsKey("fill_form")) {
-        Map<String, String> formFields = action["fill_form"];
-        for (var field in formFields.entries) {
+      }
+    } else if (action.containsKey("execute_js")) {
+      String jsCode = action["execute_js"];
+      await _webViewController!.evaluateJavascript(source: jsCode);
+    } else if (action.containsKey("infinite_scroll")) {
+      Map<String, dynamic> config = action["infinite_scroll"];
+      int maxCount = config["max_count"] ?? 0;
+      int delay = config["delay"] ?? 1000;
+      String? endClickSelector = config["end_click"]?["selector"];
+      for (int i = 0; i < maxCount || maxCount == 0; i++) {
+        await _webViewController!.evaluateJavascript(
+          source: "window.scrollTo(0, document.body.scrollHeight);",
+        );
+        await Future.delayed(Duration(milliseconds: delay));
+        if (endClickSelector != null) {
           await _webViewController!.evaluateJavascript(
-            source:
-                "document.querySelector('${field.key}').value = '${field.value}';",
+            source: "document.querySelector('$endClickSelector').click();",
           );
-        }
-      } else if (action.containsKey("execute_js")) {
-        String jsCode = action["execute_js"];
-        await _webViewController!.evaluateJavascript(source: jsCode);
-      } else if (action.containsKey("infinite_scroll")) {
-        Map<String, dynamic> config = action["infinite_scroll"];
-        int maxCount = config["max_count"] ?? 0;
-        int delay = config["delay"] ?? 1000;
-        String? endClickSelector = config["end_click"]?["selector"];
-        for (int i = 0; i < maxCount || maxCount == 0; i++) {
-          await _webViewController!.evaluateJavascript(
-            source: "window.scrollTo(0, document.body.scrollHeight);",
-          );
-          await Future.delayed(Duration(milliseconds: delay));
-          if (endClickSelector != null) {
-            await _webViewController!.evaluateJavascript(
-              source: "document.querySelector('$endClickSelector').click();",
-            );
-          }
         }
       }
     }
   }
+}
 
   @override
   Future<void> dispose() async {
