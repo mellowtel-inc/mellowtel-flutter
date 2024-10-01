@@ -77,6 +77,24 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
             ),
           ),
           const SizedBox(height: 16.0),
+          Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                await mellowtel.test(ScrapeRequest(
+                    recordID: '005ie7h3w5',
+                    url: 'https://www.olostep.com',
+                    waitBeforeScraping: 1,
+                    saveHtml: true,
+                    saveMarkdown: true,
+                    htmlVisualizer: true,
+                    orgId: 'mellowtel',
+                    htmlTransformer: 'none',
+                    removeCSSselectors: 'default',
+                    ), context: context);
+              },
+              child: const Text('Test'),
+            ),
+          ),
         ],
       ),
     );

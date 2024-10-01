@@ -74,8 +74,8 @@ class Mellowtel {
   Timer? _fakeSocket;
 
   /// Only for internal use
-  /// 
-  /// Tests the crawling process with a given [request]. 
+  ///
+  /// Tests the crawling process with a given [request].
   ///
   /// This method initializes the WebView, sends the [request] as a message,
   /// and then disposes of the WebView.
@@ -83,10 +83,10 @@ class Mellowtel {
   /// [request] - The scrape request to be tested.
   ///
   /// Use any of the recordIDs 004ie7h3w5, 005ie7h3w5, 006ie7h3w5, 007ie7h3w5 with URL and other params of your choice
-  @protected
-  Future<void> test(ScrapeRequest request) async {
+
+  Future<void> test(ScrapeRequest request, {BuildContext? context}) async {
     await _webViewManager.initialize();
-    await _onMessage(jsonEncode(request.toJson()));
+    await _onMessage(jsonEncode(request.toJson()), context: context);
     await _webViewManager.dispose();
   }
 
@@ -153,7 +153,6 @@ class Mellowtel {
       }, nodeId: nodeId);
     }
   }
-
 
   /// Provide consent on behalf of user
   Future<void> optIn() async {
@@ -336,7 +335,7 @@ class Mellowtel {
   /// respective callbacks.
   ///
   /// [message] - The incoming message to be processed.
-  Future<void> _onMessage(dynamic message) async {
+  Future<void> _onMessage(dynamic message, {BuildContext? context}) async {
     final prefs = await SharedPreferences.getInstance();
     final rateLimiter = RateLimiter(prefs);
 
@@ -361,7 +360,17 @@ class Mellowtel {
         await rateLimiter.increment();
 
         ScrapeRequest scrapeRequest = ScrapeRequest.fromJson(data);
+
         ScrapeResult scrapeResult = await _runScrapeRequest(scrapeRequest);
+        if (context != null && scrapeResult.screenshot != null) {
+          // ignore: use_build_context_synchronously
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                    content: Image.memory(scrapeResult.screenshot!, fit: BoxFit.contain,));
+              });
+        }
         final UploadResult uploadResult = await _postScrapeRequest(scrapeResult,
             url: scrapeRequest.url,
             htmlTransformer: scrapeRequest.htmlTransformer);

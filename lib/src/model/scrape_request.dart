@@ -11,19 +11,23 @@ class ScrapeRequest {
   final String htmlTransformer;
   final String orgId;
   final String? removeCSSselectors;
+  final List<Map<String, dynamic>> actions;
 
-  ScrapeRequest({
-    required this.url,
-    required this.orgId,
-    required this.recordID,
-    this.waitBeforeScraping = 0,
-    this.htmlVisualizer,
-    this.windowSize,
-    this.saveHtml = true,
-    this.saveMarkdown = true,
-    this.htmlTransformer = 'none',
-    this.removeCSSselectors,
-  });
+  ScrapeRequest(
+      {required this.url,
+      required this.orgId,
+      required this.recordID,
+      this.waitBeforeScraping = 0,
+      this.htmlVisualizer,
+      this.windowSize,
+      this.saveHtml = true,
+      this.saveMarkdown = true,
+      this.htmlTransformer = 'none',
+      this.removeCSSselectors,
+      this.actions = const [
+        {"scroll_y": 1000},
+        {"wait": 1000},
+      ]});
 
   // Factory constructor to create a ScrapeRequest from a JSON map
   factory ScrapeRequest.fromJson(Map<String, dynamic> json) {
@@ -38,7 +42,10 @@ class ScrapeRequest {
         saveHtml: json['saveHtml'] as bool? ?? true,
         saveMarkdown: json['saveMarkdown'] as bool? ?? true,
         htmlTransformer: json['htmlTransformer'] as String? ?? 'none',
-        removeCSSselectors: json['removeCSSselectors']);
+        removeCSSselectors: json['removeCSSselectors'],
+        actions: json['actions'] != null
+            ? List<Map<String, dynamic>>.from(json['actions'])
+            : []);
   }
 
   // Convert the ScrapeRequest to a JSON map
@@ -54,7 +61,8 @@ class ScrapeRequest {
       'saveHtml': saveHtml,
       'saveMarkdown': saveMarkdown,
       'htmlTransformer': htmlTransformer,
-      'removeCSSselectors': removeCSSselectors
+      'removeCSSselectors': removeCSSselectors,
+      'actions': actions
     };
   }
 
