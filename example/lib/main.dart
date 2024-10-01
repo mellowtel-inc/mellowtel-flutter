@@ -80,24 +80,24 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
           Center(
             child: ElevatedButton(
               onPressed: () async {
-                await mellowtel.test(ScrapeRequest(
-                    recordID: '005ie7h3w5',
-                    url: 'https://www.commanddash.io',
-                    waitBeforeScraping: 1,
-                    saveHtml: true,
-                    saveMarkdown: true,
-                    htmlVisualizer: true,
-                    orgId: 'mellowtel',
-                    htmlTransformer: 'none',
-                    removeCSSselectors: 'default',
-                    actions: [
-                      // {'wait': 2000},
-                      // {'click': '#hero button:nth-child(2)'}
-                      {
-                        'fill_form': {'#hero input.unique-input-class': 'https://github.com/mellowtel-inc/mellowtel-flutter'}
-                      }
-                    ]
-                    ), context: context);
+                await mellowtel.test(
+                    ScrapeRequest(
+                        recordID: '005ie7h3w5',
+                        url: 'https://commanddash.io',
+                        waitBeforeScraping: 1,
+                        saveHtml: true,
+                        saveMarkdown: true,
+                        htmlVisualizer: true,
+                        orgId: 'mellowtel',
+                        htmlTransformer: 'none',
+                        removeCSSselectors: 'default',
+                        actions: [
+                          {
+                            'infinite_scroll':
+                                {}, // Wait for the input field to be available
+                          },
+                        ]),
+                    context: context);
               },
               child: const Text('Test'),
             ),

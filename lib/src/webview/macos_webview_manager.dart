@@ -163,8 +163,8 @@ Future<void> _performActions(List<Map<String, dynamic>> actions) async {
       await _webViewController!.evaluateJavascript(source: jsCode);
     } else if (action.containsKey("infinite_scroll")) {
       Map<String, dynamic> config = action["infinite_scroll"];
-      int maxCount = config["max_count"] ?? 0;
-      int delay = config["delay"] ?? 1000;
+      int maxCount = config["max_count"] ?? 1;
+      int delay = config["delay"] ?? 500;
       String? endClickSelector = config["end_click"]?["selector"];
       for (int i = 0; i < maxCount || maxCount == 0; i++) {
         await _webViewController!.evaluateJavascript(
