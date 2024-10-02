@@ -56,7 +56,7 @@ class ClickAction extends WebViewAction {
     await webViewController.evaluateJavascript(
       source: """
       (function() {
-        const element = document.querySelector('$selector');w
+        const element = document.querySelector('$selector');
         if (element) {
           console.log('Element found: ', element);
           element.click();

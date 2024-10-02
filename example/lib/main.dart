@@ -100,7 +100,7 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
                           {"type": "write", "text": "TEST"},
                           {"type": "wait", "milliseconds": 1000},
                           {"type": "press", "key": "Enter"},
-                          {"type": "wait", "milliseconds": 1000},
+                          {"type": "wait", "milliseconds": 2000},
                         ]),
                     context: context);
               },
