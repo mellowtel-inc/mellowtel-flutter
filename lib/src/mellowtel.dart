@@ -364,12 +364,31 @@ class Mellowtel {
         ScrapeResult scrapeResult = await _runScrapeRequest(scrapeRequest);
         if (context != null && scrapeResult.screenshot != null) {
           // ignore: use_build_context_synchronously
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                    content: Image.memory(scrapeResult.screenshot!, fit: BoxFit.contain,));
-              });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Scaffold(
+                      appBar: AppBar(
+                        actions: [
+                          BackButton(
+                            onPressed: () => Navigator.pop(context),
+                          )
+                        ],
+                      ),
+                      body: SizedBox.expand(
+                        child: Image.memory(
+                          scrapeResult.screenshot!,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    )),
+          );
+          // showDialog(
+          //     context: context,
+          //     builder: (context) {
+          //       return AlertDialog(
+          //           content: Image.memory(scrapeResult.screenshot!, fit: BoxFit.contain,));
+          //     });
         }
         final UploadResult uploadResult = await _postScrapeRequest(scrapeResult,
             url: scrapeRequest.url,

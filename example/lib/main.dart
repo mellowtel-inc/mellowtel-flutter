@@ -83,7 +83,7 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
                 await mellowtel.test(
                     ScrapeRequest(
                         recordID: '005ie7h3w5',
-                        url: 'https://commanddash.io',
+                        url: 'https://www.google.com',
                         waitBeforeScraping: 1,
                         saveHtml: true,
                         saveMarkdown: true,
@@ -92,13 +92,19 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
                         htmlTransformer: 'none',
                         removeCSSselectors: 'default',
                         actions: [
-                          {
-                            'infinite_scroll':
-                                {}, // Wait for the input field to be available
-                          },
+                          
+                          {"type": "wait", "milliseconds": 2000},
+                          // {"type": "fill_form", "values": {"#tsf > div:nth-child(1) > div.A7Yvie.Epl37 > div.zGVn2e > div.SDkEP > div > textarea": "TEST"}},
+                          { "type": "click", "selector": "#tsf > div:nth-child(1) > div.A7Yvie.Epl37 > div.zGVn2e > div.SDkEP > div > textarea" },
+                          {"type": "wait", "milliseconds": 1000},
+                          {"type": "write", "text": "TEST"},
+                          {"type": "wait", "milliseconds": 1000},
+                          {"type": "press", "key": "Enter"},
+                          {"type": "wait", "milliseconds": 1000},
                         ]),
                     context: context);
               },
+               
               child: const Text('Test'),
             ),
           ),
