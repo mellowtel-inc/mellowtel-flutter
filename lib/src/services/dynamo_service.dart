@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'dart:developer' as developer;
 
 import 'package:mellowtel/src/utils/log.dart';
 
