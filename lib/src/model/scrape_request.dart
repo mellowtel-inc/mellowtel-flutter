@@ -24,10 +24,7 @@ class ScrapeRequest {
       this.saveMarkdown = true,
       this.htmlTransformer = 'none',
       this.removeCSSselectors,
-      this.actions = const [
-        {"scroll_y": 1000},
-        {"wait": 1000},
-      ]});
+      this.actions = const []});
 
   // Factory constructor to create a ScrapeRequest from a JSON map
   factory ScrapeRequest.fromJson(Map<String, dynamic> json) {

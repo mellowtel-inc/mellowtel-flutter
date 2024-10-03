@@ -75,41 +75,6 @@ class ClickAction extends WebViewAction {
   }
 }
 
-class WriteAction extends WebViewAction {
-  final String text;
-
-  WriteAction(this.text);
-
-  @override
-  Future<void> perform(dynamic webViewController) async {
-    await webViewController.evaluateJavascript(
-      source: """
-      (function() {
-        let activeElement = document.activeElement;
-        if (activeElement && ("value" in activeElement)) {
-          console.log('Active element:', activeElement);
-          console.log('Writing text:', '$text');
-          const start = activeElement.selectionStart || 0;
-          const end = activeElement.selectionEnd || 0;
-          activeElement.value = activeElement.value.substring(0, start) + '$text' + activeElement.value.substring(end);
-          activeElement.selectionStart = activeElement.selectionEnd = start + '$text'.length;
-          const event = new Event('input', { bubbles: true });
-          activeElement.dispatchEvent(event);
-          return 'Text written';
-        } else {
-          console.error('Active element is not an input or textarea');
-          return 'Active element is not an input or textarea';
-        }
-      })();
-      """,
-    ).then((result) {
-      print(result); // Log the result to the console
-    }).catchError((error) {
-      print('Error during write action: $error');
-    });
-  }
-}
-
 class PressAction extends WebViewAction {
   final String key;
 
@@ -238,8 +203,6 @@ class WebViewActionFactory {
         return WaitAction(action["milliseconds"]);
       case "click":
         return ClickAction(action["selector"]);
-      case "write":
-        return WriteAction(action["text"]);
       case "press":
         return PressAction(action["key"]);
       case "wait_for":

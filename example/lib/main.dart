@@ -92,19 +92,20 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
                         htmlTransformer: 'none',
                         removeCSSselectors: 'default',
                         actions: [
-                          
-                          {"type": "wait", "milliseconds": 2000},
-                          // {"type": "fill_form", "values": {"#tsf > div:nth-child(1) > div.A7Yvie.Epl37 > div.zGVn2e > div.SDkEP > div > textarea": "TEST"}},
-                          { "type": "click", "selector": "#tsf > div:nth-child(1) > div.A7Yvie.Epl37 > div.zGVn2e > div.SDkEP > div > textarea" },
-                          {"type": "wait", "milliseconds": 1000},
-                          {"type": "write", "text": "TEST"},
-                          {"type": "wait", "milliseconds": 1000},
-                          {"type": "press", "key": "Enter"},
-                          {"type": "wait", "milliseconds": 2000},
+                          //  {"type": "scroll", "direction": "down", "amount": 1000},
+                          // {"type": "wait", "milliseconds": 2000},
+                          // {
+                          //   "type": "click",
+                          //   "selector": 'textarea[title="Search"]'
+                          // },
+
+                          // {"type": "fill_form", "values": {'textarea[title="Search"]': "TEST"}},
+                          // {"type": "wait", "milliseconds": 1000},
+                          // {"type": "press", "key": "Enter"},
+                          // {"type": "wait", "milliseconds": 100},
                         ]),
                     context: context);
               },
-               
               child: const Text('Test'),
             ),
           ),
