@@ -86,6 +86,7 @@ class Mellowtel {
 
   Future<void> test(ScrapeRequest request, {BuildContext? context}) async {
     await _webViewManager.initialize();
+    // ignore: use_build_context_synchronously
     await _onMessage(jsonEncode(request.toJson()), context: context);
     await _webViewManager.dispose();
   }
@@ -363,8 +364,8 @@ class Mellowtel {
 
         ScrapeResult scrapeResult = await _runScrapeRequest(scrapeRequest);
         if (context != null && scrapeResult.screenshot != null) {
-          // ignore: use_build_context_synchronously
           Navigator.push(
+            // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(
                 builder: (context) => Scaffold(
@@ -377,12 +378,6 @@ class Mellowtel {
                       ),
                     )),
           );
-          // showDialog(
-          //     context: context,
-          //     builder: (context) {
-          //       return AlertDialog(
-          //           content: Image.memory(scrapeResult.screenshot!, fit: BoxFit.contain,));
-          //     });
         }
         final UploadResult uploadResult = await _postScrapeRequest(scrapeResult,
             url: scrapeRequest.url,

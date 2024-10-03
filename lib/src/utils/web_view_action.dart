@@ -67,11 +67,7 @@ class ClickAction extends WebViewAction {
         }
       })();
       """,
-    ).then((result) {
-      print(result); // Log the result to the console
-    }).catchError((error) {
-      print('Error during click action: $error');
-    });
+    );
   }
 }
 

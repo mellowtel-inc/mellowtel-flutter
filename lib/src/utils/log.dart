@@ -1,6 +1,6 @@
 import 'dart:developer' as developer;
 
-const bool loggingEnabled = true;
+const bool loggingEnabled = false;
 
 void logMellowtel(String value, {bool showAnyway = false}) {
   if (loggingEnabled || showAnyway) {

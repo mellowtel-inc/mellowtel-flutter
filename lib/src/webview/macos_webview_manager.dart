@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:mellowtel/mellowtel.dart';
 import 'package:html2md/html2md.dart' as html2md;
+import 'package:mellowtel/mellowtel.dart';
 import 'package:mellowtel/src/utils/frame_manager.dart';
 import 'package:mellowtel/src/utils/log.dart';
 import 'package:mellowtel/src/utils/web_view_action.dart';
@@ -104,7 +103,11 @@ class MacOSWebViewManager extends WebViewManager {
 
     for (var action in actions) {
       WebViewAction webViewAction = WebViewActionFactory.create(action);
-      await webViewAction.perform(_webViewController!);
+      try {
+        await webViewAction.perform(_webViewController!);
+      } catch (e) {
+        logMellowtel("Failed to perform action $action for $e");
+      }
     }
   }
 

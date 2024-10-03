@@ -264,7 +264,6 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
               child: ElevatedButton(
                 onPressed: () async {
                   await widget.onOptIn();
-
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
