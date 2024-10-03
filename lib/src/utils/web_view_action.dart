@@ -174,9 +174,8 @@ class ExecuteJsAction extends WebViewAction {
 class InfiniteScrollAction extends WebViewAction {
   final int maxCount;
   final int delay;
-  final String? endClickSelector;
 
-  InfiniteScrollAction(this.maxCount, this.delay, this.endClickSelector);
+  InfiniteScrollAction(this.maxCount, this.delay);
 
   @override
   Future<void> perform(dynamic webViewController) async {
@@ -185,11 +184,6 @@ class InfiniteScrollAction extends WebViewAction {
         source: "window.scrollTo(0, document.body.scrollHeight);",
       );
       await Future.delayed(Duration(milliseconds: delay));
-      if (endClickSelector != null) {
-        await webViewController.evaluateJavascript(
-          source: "document.querySelector('$endClickSelector').click();",
-        );
-      }
     }
   }
 }
@@ -215,10 +209,7 @@ class WebViewActionFactory {
         return ExecuteJsAction(action["js"]);
       case "infinite_scroll":
         return InfiniteScrollAction(
-          action["max_count"] ?? 1,
-          action["delay"] ?? 500,
-          action["end_click"]?["selector"],
-        );
+            action["max_count"] ?? 1, action["delay"] ?? 500);
       default:
         throw ArgumentError("Invalid action type: ${action["type"]}");
     }

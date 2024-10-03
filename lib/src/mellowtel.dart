@@ -368,13 +368,7 @@ class Mellowtel {
             context,
             MaterialPageRoute(
                 builder: (context) => Scaffold(
-                      appBar: AppBar(
-                        actions: [
-                          BackButton(
-                            onPressed: () => Navigator.pop(context),
-                          )
-                        ],
-                      ),
+                      appBar: AppBar(),
                       body: SizedBox.expand(
                         child: Image.memory(
                           scrapeResult.screenshot!,
