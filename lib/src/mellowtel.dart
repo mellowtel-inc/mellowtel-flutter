@@ -74,8 +74,8 @@ class Mellowtel {
   Timer? _fakeSocket;
 
   /// Only for internal use
-  /// 
-  /// Tests the crawling process with a given [request]. 
+  ///
+  /// Tests the crawling process with a given [request].
   ///
   /// This method initializes the WebView, sends the [request] as a message,
   /// and then disposes of the WebView.
@@ -95,18 +95,21 @@ class Mellowtel {
   /// [onOptIn] and [onOptOut] allow you to enable or disable services based on user's choice.
   /// They are only called the first time user makes a choice or if changes their consent later.
   ///
-  /// [showDefaultConsentDialog] can be used to disable the default dialog and use your own [optIn] and [optOut].
+  /// [showConsentDialog]: `true` by default. Set `false` if you have to show the permission dialog manually or somewhere else
   Future<void> start(BuildContext context,
       {required OnOptIn onOptIn,
       required OnOptOut onOptOut,
-      bool showDefaultConsentDialog = true}) async {
+      bool showConsentDialog = true}) async {
     if (_initialized) return;
     try {
       bool? consent = (await sharedPrefsService).getConsent();
       if (consent == null) {
-        if (!showDefaultConsentDialog) {
-          throw Exception(
-              '[Mellowtel]: Please enable showDefaultConsentDialog or set user permission via optIn or optOut methods first.');
+        if (!showConsentDialog) {
+          logMellowtel(
+              """Not showing permission consent dialog since [showConsentDialog] is set to `false`.
+              
+               Either call [start] with  [showConsentDialog] where you would like user to provide consent or set user permission via [optIn] or [optOut] methods manually.""");
+               return ;
         }
         if (context.mounted) {
           consent = await _showConsentDialog(
@@ -154,7 +157,6 @@ class Mellowtel {
     }
   }
 
-
   /// Provide consent on behalf of user
   Future<void> optIn() async {
     final previousConsent = (await sharedPrefsService).getConsent();
@@ -193,7 +195,7 @@ class Mellowtel {
   Future<void> _startScraping() async {
     _initialized = true;
     await _webViewManager.initialize();
-    const version = '0.0.1';
+    const version = '0.0.2';
 
     // flutter-macos or flutter-windows
     final platform = Platform.operatingSystem == 'macos'
@@ -279,7 +281,7 @@ class Mellowtel {
 
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           content: ConsentDialog(
             appName: appName,
             asset: appIcon,
@@ -311,7 +313,7 @@ class Mellowtel {
 
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           content: ConsentSettingsDialog(
             appName: appName,
             asset: appIcon,
