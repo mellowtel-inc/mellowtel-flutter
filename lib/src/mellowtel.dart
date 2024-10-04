@@ -83,7 +83,6 @@ class Mellowtel {
   /// [request] - The scrape request to be tested.
   ///
   /// Use any of the recordIDs 004ie7h3w5, 005ie7h3w5, 006ie7h3w5, 007ie7h3w5 with URL and other params of your choice
-  @protected
   Future<void> test(ScrapeRequest request) async {
     await _webViewManager.initialize();
     await _onMessage(jsonEncode(request.toJson()));
