@@ -10,6 +10,7 @@ import 'package:mellowtel/src/services/local_shared_prefs_service.dart';
 import 'package:mellowtel/src/services/s3_service.dart';
 import 'package:mellowtel/src/ui/consent_dialog.dart';
 import 'package:mellowtel/src/ui/consent_settings_dialog.dart';
+import 'package:mellowtel/src/utils/log.dart';
 import 'package:mellowtel/src/utils/rate_limiter.dart';
 import 'package:mellowtel/src/webview/macos_webview_manager.dart';
 import 'package:mellowtel/src/webview/webview_manager.dart';
@@ -29,16 +30,12 @@ class Mellowtel {
   ///
   /// Optional callbacks [onScrapingResult], [onScrapingException], and
   /// [onStorageException] can be provided to handle respective events.
-  Mellowtel(
-    this._configurationKey, {
-    this.onScrapingResult,
-    this.onScrapingException,
-    this.onStorageException,
-    required this.appName,
-    required this.appIcon,
-    required this.incentive,
-    required this.yesText,
-  }) {
+  Mellowtel(this._configurationKey,
+      {required this.appName,
+      required this.appIcon,
+      required this.incentive,
+      required this.yesText,
+      this.showDebugLogs = false}) {
     _webViewManager = Platform.isWindows
         ? throw Exception('Only Macos and iOS Platforms are supported.')
         : Platform.isMacOS || Platform.isIOS
@@ -48,6 +45,7 @@ class Mellowtel {
   }
 
   final String _configurationKey;
+  final bool showDebugLogs;
   final _storageService = S3Service();
 
   WebSocketChannel? _channel;
@@ -59,10 +57,6 @@ class Mellowtel {
       LocalSharedPrefsService(await SharedPreferences.getInstance());
 
   final Connectivity connectivity = Connectivity();
-
-  OnScrapingResult? onScrapingResult;
-  OnScrapingException? onScrapingException;
-  OnStorageException? onStorageException;
 
   // Consent dialog values
   final String appName;
@@ -78,6 +72,8 @@ class Mellowtel {
 
   Timer? _fakeSocket;
 
+  /// Only for internal use
+  ///
   /// Tests the crawling process with a given [request].
   ///
   /// This method initializes the WebView, sends the [request] as a message,
@@ -97,18 +93,21 @@ class Mellowtel {
   /// [onOptIn] and [onOptOut] allow you to enable or disable services based on user's choice.
   /// They are only called the first time user makes a choice or if changes their consent later.
   ///
-  /// [showDefaultConsentDialog] can be used to disable the default dialog and have your own opt-in.
+  /// [showConsentDialog]: `true` by default. Set `false` if you have to show the permission dialog manually or somewhere else
   Future<void> start(BuildContext context,
       {required OnOptIn onOptIn,
       required OnOptOut onOptOut,
-      bool showDefaultConsentDialog = true}) async {
+      bool showConsentDialog = true}) async {
     if (_initialized) return;
     try {
       bool? consent = (await sharedPrefsService).getConsent();
       if (consent == null) {
-        if (!showDefaultConsentDialog) {
-          throw Exception(
-              '[Mellowtel]: Please enable showDefaultConsentDialog or set user permission via optIn or optOut methods first.');
+        if (!showConsentDialog) {
+          logMellowtel(
+              """Not showing permission consent dialog since [showConsentDialog] is set to `false`.
+              
+               Either call [start] with  [showConsentDialog] where you would like user to provide consent or set user permission via [optIn] or [optOut] methods manually.""");
+               return ;
         }
 
         consent = await _showConsentDialog(
@@ -126,7 +125,7 @@ class Mellowtel {
         await _startScraping();
       }
     } catch (e) {
-      developer.log('[Mellowtel]: $e');
+      logMellowtel('$e');
     }
   }
 
@@ -150,6 +149,7 @@ class Mellowtel {
     nodeId: nodeId);
   }
 
+  /// Provide consent on behalf of user
   Future<void> optIn() async {
     final previousConsent = (await sharedPrefsService).getConsent();
     if (previousConsent == null || !previousConsent) {
@@ -158,6 +158,7 @@ class Mellowtel {
     }
   }
 
+  /// Revoke consent on behalf of user
   Future<void> optOut() async {
     final previousConsent = (await sharedPrefsService).getConsent();
     if (previousConsent != null && previousConsent) {
@@ -186,7 +187,7 @@ class Mellowtel {
   Future<void> _startScraping() async {
     _initialized = true;
     await _webViewManager.initialize();
-    const version = '0.0.3';
+    const version = '0.0.2';
 
     // flutter-macos or flutter-windows
     final platform = Platform.operatingSystem == 'macos'
@@ -210,7 +211,7 @@ class Mellowtel {
         connectivityResult == ConnectivityResult.ethernet) {
       _connectWebSocket(url);
     } else {
-      developer.log('Not connected to Wi-Fi. WebSocket connection aborted.');
+      logMellowtel('Not connected to Wi-Fi. WebSocket connection aborted.');
     }
   }
 
@@ -237,7 +238,7 @@ class Mellowtel {
     }, onDone: () {
       /// 1005 is the close code when termination is voluntarily terminated
       if (_channel != null && _channel?.closeCode != 1005) {
-        developer.log('WebSocket Closed with Code: ${_channel?.closeCode}');
+        logMellowtel('WebSocket Closed with Code: ${_channel?.closeCode}');
         _handleDisconnection(url);
       }
     });
@@ -246,14 +247,14 @@ class Mellowtel {
   Future<void> _handleDisconnection(String url) async {
     if (_reconnectAttempts < _maxReconnectAttempts) {
       final delay = _initialReconnectDelay * (1 << _reconnectAttempts);
-      developer.log(
+      logMellowtel(
           'WebSocket disconnected. Reconnecting in ${delay.inSeconds} seconds...');
       Future.delayed(delay, () {
         _reconnectAttempts++;
         _connectWebSocket(url);
       });
     } else {
-      developer.log('Max reconnection attempts reached. Giving up.');
+      logMellowtel('Max reconnection attempts reached. Giving up.');
     }
   }
 
@@ -272,7 +273,7 @@ class Mellowtel {
 
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           content: ConsentDialog(
             appName: appName,
             asset: appIcon,
@@ -304,7 +305,7 @@ class Mellowtel {
 
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           content: ConsentSettingsDialog(
             appName: appName,
             asset: appIcon,
@@ -334,7 +335,7 @@ class Mellowtel {
     final rateLimiter = RateLimiter(prefs);
 
     if (await rateLimiter.getIfDailyRateLimitReached()) {
-      developer.log(
+      logMellowtel(
           'Mellowtel: Daily rate limit reached. Closing WebSocket connection.');
       await stop();
       return;
@@ -359,15 +360,11 @@ class Mellowtel {
             url: scrapeRequest.url,
             htmlTransformer: scrapeRequest.htmlTransformer);
         await DynamoService.updateDynamo(uploadResult);
-        developer.log('MellowTel: Scrape result posted');
-        onScrapingResult?.call(scrapeResult);
+        logMellowtel('MellowTel: Scrape result posted');
+        if (showDebugLogs) logMellowtel("USAGE SUCCESS", showAnyway: true);
       }
-    } on ScrapingException catch (e) {
-      onScrapingException?.call(e);
-    } on StorageException catch (e) {
-      onStorageException?.call(e);
     } catch (e) {
-      throw Exception(e);
+      if (showDebugLogs) logMellowtel("USAGE ERROR: $e", showAnyway: true);
     }
   }
 

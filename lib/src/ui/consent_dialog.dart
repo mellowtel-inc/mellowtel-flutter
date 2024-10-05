@@ -21,7 +21,7 @@ class ConsentDialog extends StatelessWidget {
         MediaQuery.of(context).orientation == Orientation.landscape;
     bool isDesktop = MediaQuery.of(context).size.width > 600;
     return Container(
-      color: Colors.white,
+      // color: Theme.of(context).colorScheme.surface,
       child: SafeArea(
         child: Container(
           child: !isLandscape || isDesktop
@@ -99,11 +99,9 @@ class ConsentDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 16.0),
-              Column(
-                children: const [Icon(Icons.sync_alt), Text("")],
+              const Column(
+                children: [Icon(Icons.sync_alt), Text("")],
               ),
-              const SizedBox(width: 16.0),
               Column(
                 children: [
                   const CircleAvatar(
@@ -116,11 +114,9 @@ class ConsentDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 16.0),
-              Column(
-                children: const [Icon(Icons.sync_alt), Text("")],
+              const Column(
+                children: [Icon(Icons.sync_alt), Text("")],
               ),
-              const SizedBox(width: 16.0),
               Column(
                 children: [
                   const CircleAvatar(

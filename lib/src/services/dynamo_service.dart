@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
 
+import 'package:mellowtel/src/utils/log.dart';
+
 class UploadResult {
   final String recordID;
   final String url;
@@ -38,14 +40,14 @@ class DynamoService {
       ..headers["Content-Type"] = "text/plain"
       ..body = jsonEncode(bodyData);
 
-    developer.log(
+    logMellowtel(
         "[updateDynamo]: Sending data to server => ${uploadResult.recordID}");
 
     try {
       final response = await http.Client().send(requestOptions);
       if (response.statusCode == 200) {
         final data = await response.stream.bytesToString();
-        developer.log("Response from server: $data");
+        logMellowtel("Response from server: $data");
       } else {
         throw Exception("Network response was not ok");
       }

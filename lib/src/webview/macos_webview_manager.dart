@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:mellowtel/mellowtel.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:mellowtel/src/utils/frame_manager.dart';
+import 'package:mellowtel/src/utils/log.dart';
 
 import 'webview_manager.dart';
 
@@ -16,16 +17,14 @@ class MacOSWebViewManager extends WebViewManager {
 
   @override
   Future<void> initialize() async {
-    // developer.log("Initializing macOS WebView");
+    PlatformInAppWebViewController.debugLoggingSettings.enabled = loggingEnabled;
     _headlessWebView = HeadlessInAppWebView(onWebViewCreated: (controller) {
-      developer.log("MellowTel: Webview created!");
+      logMellowtel("MellowTel: Webview created!");
       _webViewController = controller;
     }, onLoadStop: (controller, url) async {
-      // developer.log("Page loaded: $url");
       _pageLoadCompleter?.complete();
     }, onProgressChanged: (_, int x) {
-      // developer.log("progress change : $x");
-    });
+    }, );
 
     await _headlessWebView!.run();
   }

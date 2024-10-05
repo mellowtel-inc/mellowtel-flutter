@@ -51,7 +51,7 @@ class S3Service implements StorageService {
       },
       body: content,
     );
-    // developer.log("===>html: ${stopwatch.elapsedMilliseconds}");
+    // logMellowtel("===>html: ${stopwatch.elapsedMilliseconds}");
 
     if (response.statusCode != 200) {
       throw Exception('Failed to upload HTML');
@@ -70,7 +70,7 @@ class S3Service implements StorageService {
       },
       body: content,
     );
-    // developer.log("===>markdown: ${stopwatch.elapsedMilliseconds}");
+    // logMellowtel("===>markdown: ${stopwatch.elapsedMilliseconds}");
     if (response.statusCode != 200) {
       throw Exception('Failed to upload Markdown');
     }
@@ -89,7 +89,7 @@ class S3Service implements StorageService {
       },
       body: base64Image,
     );
-    // developer.log("===>image: ${stopwatch.elapsedMilliseconds}");
+    // logMellowtel("===>image: ${stopwatch.elapsedMilliseconds}");
 
     if (response.statusCode != 200) {
       throw Exception('Failed to upload image');

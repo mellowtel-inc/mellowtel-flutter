@@ -48,7 +48,7 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
     bool isDesktop = MediaQuery.of(context).size.width > 600;
 
     return Container(
-      color: Colors.white,
+      // color:Theme.of(context).colorScheme.surface,
       child: SafeArea(
         child: Container(
           child: !isLandscape || isDesktop
