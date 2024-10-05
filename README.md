@@ -49,12 +49,16 @@ await mellowtel.start(
       }, 
       onOptOut: () async {
         // Handle disabling services if consent is denied.
-  });
+      },
+      showConsentDialog: true
+    );
 ```
 
 This will open up a one-time consent popup for the user to accept.
 
 <img src = 'assets/consent-popup.png' width = 300px></img>
+
+> You can change `showConsentDialog` param to false to ask for consent manually or in a differnt page after a successful user interaction.
 
 ### 3. Consent Settings Page (Optional)
 
@@ -68,10 +72,13 @@ await mellowtel.showConsentSettingsPage(
     }, 
     onOptOut: () async {
       // Handle disabling services if consent is denied.
-  });
+    },
+  );
 ```
 
 <img src = 'assets/settings-popup.png' width = 300px></img>
+
+
 
 
 ### 4. Befrore you deploy 
