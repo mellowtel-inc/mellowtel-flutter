@@ -17,14 +17,15 @@ class MacOSWebViewManager extends WebViewManager {
 
   @override
   Future<void> initialize() async {
-    PlatformInAppWebViewController.debugLoggingSettings.enabled = loggingEnabled;
-    _headlessWebView = HeadlessInAppWebView(onWebViewCreated: (controller) {
-      logMellowtel("MellowTel: Webview created!");
-      _webViewController = controller;
-    }, onLoadStop: (controller, url) async {
-      _pageLoadCompleter?.complete();
-    }, onProgressChanged: (_, int x) {
-    }, );
+    _headlessWebView = HeadlessInAppWebView(
+        onWebViewCreated: (controller) {
+          logMellowtel("MellowTel: Webview created!");
+          _webViewController = controller;
+        },
+        onLoadStop: (controller, url) async {
+          _pageLoadCompleter?.complete();
+        },
+        onProgressChanged: (_, int x) {});
 
     await _headlessWebView!.run();
   }
@@ -59,7 +60,8 @@ class MacOSWebViewManager extends WebViewManager {
 
   Future<void> _loadUrlAndWait(String url, String? removeCSSselectors) async {
     _pageLoadCompleter = Completer<void>();
-    await _webViewController!.loadUrl(urlRequest: URLRequest(url: Uri.parse(url)));
+    await _webViewController!
+        .loadUrl(urlRequest: URLRequest(url: Uri.parse(url)));
     await FrameManager().waitForIdleFrames();
     await _pageLoadCompleter!.future;
     // Inject and execute JavaScript to remove selectors
