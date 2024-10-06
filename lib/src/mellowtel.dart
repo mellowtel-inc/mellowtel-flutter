@@ -187,7 +187,7 @@ class Mellowtel {
   Future<void> _startScraping() async {
     _initialized = true;
     await _webViewManager.initialize();
-    const version = '0.0.2';
+    const version = '0.0.3';
 
     // flutter-macos or flutter-windows
     final platform = Platform.operatingSystem == 'macos'
@@ -331,6 +331,7 @@ class Mellowtel {
   ///
   /// [message] - The incoming message to be processed.
   Future<void> _onMessage(dynamic message) async {
+    logMellowtel(message);
     final prefs = await SharedPreferences.getInstance();
     final rateLimiter = RateLimiter(prefs);
 
