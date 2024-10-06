@@ -47,50 +47,47 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
         MediaQuery.of(context).orientation == Orientation.landscape;
     bool isDesktop = MediaQuery.of(context).size.width > 600;
 
-    return Container(
-      // color:Theme.of(context).colorScheme.surface,
-      child: SafeArea(
-        child: Container(
-          child: !isLandscape || isDesktop
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInformationWidget(context),
-                        const SizedBox(height: 20.0),
-                        Center(child: _buildActions(context)),
-                      ],
-                    ),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+    return SafeArea(
+      child: Container(
+        child: !isLandscape || isDesktop
+            ? Padding(
+                padding: const EdgeInsets.symmetric(),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: SingleChildScrollView(
-                              child: _buildInformationWidget(context)),
-                        ),
-                      ),
-                      Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: _buildActions(context),
-                        ),
-                      ),
+                      _buildInformationWidget(context),
+                      const SizedBox(height: 20.0),
+                      Center(child: _buildActions(context)),
                     ],
                   ),
                 ),
-        ),
+              )
+            : Padding(
+                padding: const EdgeInsets.symmetric(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: SingleChildScrollView(
+                            child: _buildInformationWidget(context)),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: _buildActions(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -265,6 +262,7 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                 onPressed: () async {
                   await widget.onOptIn();
 
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -293,6 +291,7 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
                 ),
                 onPressed: () async {
                   await widget.onOptOut();
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 },
                 child: const Text("I'm sure"),

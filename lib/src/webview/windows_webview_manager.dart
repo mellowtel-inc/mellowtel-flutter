@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 
 import 'package:mellowtel/mellowtel.dart';
 import 'package:html2md/html2md.dart' as html2md;
