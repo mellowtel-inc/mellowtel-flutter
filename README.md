@@ -56,7 +56,7 @@ await mellowtel.start(
 
 This will open up a one-time consent popup for the user to accept.
 
-<img src = 'assets/consent-popup.png' width = 300px></img>
+<img src = 'https://raw.githubusercontent.com/mellowtel-inc/mellowtel-flutter/main/assets/consent-popup.png' width = 300px></img>
 
 > You can change `showConsentDialog` param to false to ask for consent manually or in a differnt page after a successful user interaction.
 
@@ -76,7 +76,7 @@ await mellowtel.showConsentSettingsPage(
   );
 ```
 
-<img src = 'assets/settings-popup.png' width = 300px></img>
+<img src = 'https://raw.githubusercontent.com/mellowtel-inc/mellowtel-flutter/main/assets/settings-popup.png' width = 300px></img>
 
 
 

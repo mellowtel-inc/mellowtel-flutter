@@ -34,7 +34,7 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
       appName: 'King Kong',
       appIcon: 'asset/logo.png',
       incentive: 'Earn 500 coins in Sling Kong',
-      yesText: 'FREE Coins!',
+      yesText: 'Coins!',
       showDebugLogs: true);
 
   @override

@@ -1,6 +1,6 @@
 name: mellowtel
 description: "With Mellowtel, your users can share a fraction of their unused internet by using a transparent opt-in/out mechanism. Trusted partners access the internet through this network, and you get paid for it."
-version: 0.0.3
+version: 0.0.4
 homepage: https://www.mellowtel.dev/flutter/
 repository: https://github.com/mellowtel-inc/mellowtel-flutter
 issue_tracker: https://github.com/mellowtel-inc/mellowtel-flutter/issues
