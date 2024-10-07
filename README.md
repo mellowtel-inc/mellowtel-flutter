@@ -33,7 +33,7 @@ final Mellowtel mellowtel = Mellowtel(
     appIcon: 'asset/logo.png',
     incentive:
         'Earn 500 coins in Sling Kong',
-    yesText: 'FREE Coins!',
+    yesText: 'Coins!',
   );
 ```
 
