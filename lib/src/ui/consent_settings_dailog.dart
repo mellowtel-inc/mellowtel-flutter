@@ -158,7 +158,7 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
   String _getInformationText() {
     switch (_state) {
       case ContainerState.optedIn:
-        return "Mellowtel is an open-source library that lets you share your unused internet with trusted Al labs & startups who use it to train their models. The developer of this app gets a small share of the revenue. It helps maintain this app free and available. Mellowtel shares your bandwidth only. Security and privacy are 100% guaranteed. It doesn't collect, share, or sell personal information (not even anonymized data).";
+        return "Mellowtel is an open-source library that lets you share your unused internet with trusted startups who use it to access and retrieve information from public websites. The developer of this app gets a small share of the revenue. It helps maintain this app free. Mellowtel shares internet bandwidth only.\n\nNone of your personal information (not even anonymized data) is collected except the IP address which is used just to infer the country of origin to provide geo-specific services.";
       case ContainerState.optedOut:
         return 'You are currently opted out. Your device\'s resources are not being used.';
       case ContainerState.confirmOptOut:
@@ -180,7 +180,7 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
           Center(
             child: GestureDetector(
               onTap: () async {
-                final url = Uri.parse('https://www.mellowtel.it/flutter/');
+                final url = Uri.parse('https://www.mellowtel.com/mellowtel-privacy-policy/');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {

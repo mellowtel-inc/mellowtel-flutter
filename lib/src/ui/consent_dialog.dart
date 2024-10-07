@@ -170,7 +170,7 @@ class ConsentDialog extends StatelessWidget {
           Center(
             child: GestureDetector(
               onTap: () async {
-                final url = Uri.parse('https://www.mellowtel.it/flutter/');
+                final url = Uri.parse('https://www.mellowtel.com/mellowtel-privacy-policy/');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {
@@ -216,13 +216,13 @@ class ConsentDialog extends StatelessWidget {
         Align(
           alignment: Alignment.center,
           child: Text(
-            '$incentive, allow mellowtel to use your device\'s free resources and IP address to download public web data from the internet while you are using $appName',
+            '$incentive. If you click on “Yes”, you can share your unused bandwidth with Mellowtel to enable access to public websites helping keep the app free.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
         const SizedBox(height: 16.0),
         Text(
-          'None of your personal information is collected, except your IP address.\n\nYour participation is totally optional and you may opt out at any time.',
+          'It shares internet bandwidth only. No personal information is collected.\n\nYour participation is totally optional. You can opt-in or out at any moment from the settings page.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
