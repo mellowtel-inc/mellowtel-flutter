@@ -10,20 +10,21 @@ enum ContainerState {
 
 class ConsentSettingsDialog extends StatefulWidget {
   final String appName;
-  final String asset;
+
   final bool initiallyOptedIn;
   final OnOptIn onOptIn;
   final OnOptOut onOptOut;
   final String nodeId;
+  final String? asset;
 
   const ConsentSettingsDialog({
     super.key,
     required this.appName,
-    required this.asset,
     required this.initiallyOptedIn,
     required this.onOptIn,
     required this.onOptOut,
     required this.nodeId,
+    this.asset,
   });
 
   @override
@@ -96,15 +97,17 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Image.asset(
-            widget.asset,
-            height: 64,
-            width: 64,
+        if (widget.asset != null) ...[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Image.asset(
+              widget.asset!,
+              height: 64,
+              width: 64,
+            ),
           ),
-        ),
-        const SizedBox(height: 16.0),
+          const SizedBox(height: 16.0),
+        ],
         Align(
           alignment: Alignment.topLeft,
           child: Text(
@@ -135,14 +138,14 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
           ),
         ),
         const SizedBox(height: 4.0),
-        if(_state!=ContainerState.optedOut)
-        Align(
-          alignment: Alignment.topLeft,
-          child: Text(
-            "Node ID: ${widget.nodeId}",
-            style: Theme.of(context).textTheme.labelSmall,
+        if (_state != ContainerState.optedOut)
+          Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "Node ID: ${widget.nodeId}",
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
           ),
-        ),
         const SizedBox(height: 16.0),
         Align(
           alignment: Alignment.center,
@@ -180,7 +183,8 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
           Center(
             child: GestureDetector(
               onTap: () async {
-                final url = Uri.parse('https://www.mellowtel.com/mellowtel-privacy-policy/');
+                final url = Uri.parse(
+                    'https://www.mellowtel.com/mellowtel-privacy-policy/');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {

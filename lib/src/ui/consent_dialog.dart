@@ -3,16 +3,20 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ConsentDialog extends StatelessWidget {
   final String appName;
-  final String asset;
   final String incentive;
-  final String yesText;
+  final String? yesText;
+  final String? noText;
+  final String? asset;
+  final String? consentTextOverride;
 
   const ConsentDialog({
     super.key,
     required this.appName,
-    required this.asset,
     required this.incentive,
-    required this.yesText,
+    this.yesText,
+    this.noText,
+    this.asset,
+    this.consentTextOverride,
   });
 
   @override
@@ -86,8 +90,10 @@ class ConsentDialog extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  const CircleAvatar(
-                    child: Icon(Icons.shield_outlined),
+                   CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    child: const Icon(Icons.shield_outlined),
                   ),
                   Text(
                     "Secure\ncloud",
@@ -101,8 +107,10 @@ class ConsentDialog extends StatelessWidget {
               ),
               Column(
                 children: [
-                  const CircleAvatar(
-                    child: Icon(Icons.phone_android_outlined),
+                  CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    child: const Icon(Icons.phone_android_outlined),
                   ),
                   Text(
                     "Your\ndevice",
@@ -116,8 +124,10 @@ class ConsentDialog extends StatelessWidget {
               ),
               Column(
                 children: [
-                  const CircleAvatar(
-                    child: Icon(Icons.language),
+                   CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    child: const Icon(Icons.language),
                   ),
                   Text(
                     "Public\nwebsite",
@@ -143,7 +153,7 @@ class ConsentDialog extends StatelessWidget {
                     Navigator.of(context)
                         .pop(false); // Returns false on decline
                   },
-                  child: const Text('No'),
+                  child: Text(noText ?? 'No'),
                 ),
               ),
               const SizedBox(width: 8.0),
@@ -161,7 +171,7 @@ class ConsentDialog extends StatelessWidget {
                       vertical: 16.0,
                     ),
                   ),
-                  child: Text("Yes $yesText"),
+                  child: Text(yesText ?? "Yes"),
                 ),
               ),
             ],
@@ -170,7 +180,8 @@ class ConsentDialog extends StatelessWidget {
           Center(
             child: GestureDetector(
               onTap: () async {
-                final url = Uri.parse('https://www.mellowtel.com/mellowtel-privacy-policy/');
+                final url = Uri.parse(
+                    'https://www.mellowtel.com/mellowtel-privacy-policy/');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {
@@ -194,15 +205,18 @@ class ConsentDialog extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // App Icon
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Image.asset(
-            asset,
-            height: 64,
-            width: 64,
+        if (asset != null) ...[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Image.asset(
+              asset!,
+              height: 64,
+              width: 64,
+            ),
           ),
-        ),
-        const SizedBox(height: 16.0),
+          const SizedBox(height: 16.0),
+        ],
+
         Align(
           alignment: Alignment.topLeft,
           child: Text(
@@ -213,18 +227,23 @@ class ConsentDialog extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16.0),
-        Align(
-          alignment: Alignment.center,
-          child: Text(
+        if (consentTextOverride != null)
+          Text(
+            consentTextOverride!,
+            style: Theme.of(context).textTheme.bodyMedium,
+          )
+        else ...[
+          Text(
             '$incentive. If you click on “Yes”, you can share your unused bandwidth with Mellowtel to enable access to public websites helping keep the app free.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-        ),
-        const SizedBox(height: 16.0),
-        Text(
-          'It shares internet bandwidth only. No personal information is collected.\n\nYour participation is totally optional. You can opt-in or out at any moment from the settings page.',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+          const SizedBox(height: 16.0),
+          Text(
+            consentTextOverride ??
+                'It shares internet bandwidth only. No personal information is collected.\n\nYour participation is totally optional. You can opt-in or out at any moment from the settings page.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ]
       ],
     );
   }

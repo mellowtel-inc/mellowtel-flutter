@@ -33,10 +33,12 @@ class Mellowtel {
   /// [onStorageException] can be provided to handle respective events.
   Mellowtel(this._configurationKey,
       {required this.appName,
-      required this.appIcon,
       required this.incentive,
-      required this.yesText,
-      this.showDebugLogs = false}) {
+      this.yesText,
+      this.noText,
+      this.showDebugLogs = false,
+      this.appIcon,
+      this.consentTextOverride}) {
     _webViewManager = Platform.isWindows
         ? WindowsWebViewManager()
         : Platform.isMacOS || Platform.isIOS
@@ -61,9 +63,12 @@ class Mellowtel {
 
   // Consent dialog values
   final String appName;
-  final String appIcon;
   final String incentive;
-  final String yesText;
+
+  final String? yesText;
+  final String? noText;
+  final String? appIcon;
+  final String? consentTextOverride;
 
   int _reconnectAttempts = 0;
   final int _maxReconnectAttempts = 5;
@@ -108,7 +113,7 @@ class Mellowtel {
               """Not showing permission consent dialog since [showConsentDialog] is set to `false`.
               
                Either call [start] with  [showConsentDialog] where you would like user to provide consent or set user permission via [optIn] or [optOut] methods manually.""");
-               return ;
+          return;
         }
         if (context.mounted) {
           consent = await _showConsentDialog(
@@ -117,6 +122,7 @@ class Mellowtel {
             appIcon: appIcon,
             incentive: incentive,
             yesText: yesText,
+            noText: noText
           );
           consent ? await onOptIn() : await onOptOut();
 
@@ -268,9 +274,10 @@ class Mellowtel {
   Future<bool> _showConsentDialog(
     BuildContext context, {
     required String appName,
-    required String appIcon,
+    required String? appIcon,
     required String incentive,
-    required String yesText,
+    required String? yesText,
+    required String? noText,
   }) async {
     Completer<bool> completer = Completer();
     showDialog(
@@ -286,6 +293,8 @@ class Mellowtel {
             asset: appIcon,
             incentive: incentive,
             yesText: yesText,
+          noText: noText,
+            consentTextOverride: consentTextOverride,
           ),
         );
       },
@@ -299,7 +308,7 @@ class Mellowtel {
 
   Future<void> _showConsentSettingsDialog(BuildContext context,
       {required String appName,
-      required String appIcon,
+      required String? appIcon,
       required OnOptIn onOptIn,
       required OnOptOut onOptOut,
       required bool consent,
