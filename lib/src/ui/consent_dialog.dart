@@ -4,19 +4,19 @@ import 'package:url_launcher/url_launcher.dart';
 class ConsentDialog extends StatelessWidget {
   final String appName;
   final String incentive;
-  final String? yesText;
-  final String? noText;
-  final String? asset;
-  final String? consentTextOverride;
+  final String? acceptButtonText;
+  final String? declineButtonText;
+  final String? appIcon;
+  final String? dialogTextOverride;
 
   const ConsentDialog({
     super.key,
     required this.appName,
     required this.incentive,
-    this.yesText,
-    this.noText,
-    this.asset,
-    this.consentTextOverride,
+    this.acceptButtonText,
+    this.declineButtonText,
+    this.appIcon,
+    this.dialogTextOverride,
   });
 
   @override
@@ -153,7 +153,7 @@ class ConsentDialog extends StatelessWidget {
                     Navigator.of(context)
                         .pop(false); // Returns false on decline
                   },
-                  child: Text(noText ?? 'No'),
+                  child: Text(declineButtonText ?? 'No'),
                 ),
               ),
               const SizedBox(width: 8.0),
@@ -171,7 +171,7 @@ class ConsentDialog extends StatelessWidget {
                       vertical: 16.0,
                     ),
                   ),
-                  child: Text(yesText ?? "Yes"),
+                  child: Text(acceptButtonText ?? "Yes"),
                 ),
               ),
             ],
@@ -205,11 +205,11 @@ class ConsentDialog extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // App Icon
-        if (asset != null) ...[
+        if (appIcon != null) ...[
           Align(
             alignment: Alignment.centerLeft,
             child: Image.asset(
-              asset!,
+              appIcon!,
               height: 64,
               width: 64,
             ),
@@ -227,9 +227,9 @@ class ConsentDialog extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16.0),
-        if (consentTextOverride != null)
+        if (dialogTextOverride != null)
           Text(
-            consentTextOverride!,
+            dialogTextOverride!,
             style: Theme.of(context).textTheme.bodyMedium,
           )
         else ...[
@@ -239,7 +239,7 @@ class ConsentDialog extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           Text(
-            consentTextOverride ??
+            dialogTextOverride ??
                 'It shares internet bandwidth only. No personal information is collected.\n\nYour participation is totally optional. You can opt-in or out at any moment from the settings page.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),

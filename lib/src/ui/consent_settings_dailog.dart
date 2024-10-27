@@ -15,7 +15,7 @@ class ConsentSettingsDialog extends StatefulWidget {
   final OnOptIn onOptIn;
   final OnOptOut onOptOut;
   final String nodeId;
-  final String? asset;
+  final String? appIcons;
 
   const ConsentSettingsDialog({
     super.key,
@@ -24,7 +24,7 @@ class ConsentSettingsDialog extends StatefulWidget {
     required this.onOptIn,
     required this.onOptOut,
     required this.nodeId,
-    this.asset,
+    this.appIcons,
   });
 
   @override
@@ -97,11 +97,11 @@ class ConsentSettingsDialogState extends State<ConsentSettingsDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.asset != null) ...[
+        if (widget.appIcons != null) ...[
           Align(
             alignment: Alignment.centerLeft,
             child: Image.asset(
-              widget.asset!,
+              widget.appIcons!,
               height: 64,
               width: 64,
             ),
