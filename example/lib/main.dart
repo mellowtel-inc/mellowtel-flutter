@@ -34,7 +34,7 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
       appName: 'King Kong',
       appIcon: 'asset/logo.png',
       incentive: 'Earn 500 coins in Sling Kong',
-      yesText: 'FREE Coins!',
+      yesText: 'Coins!',
       showDebugLogs: true);
 
   @override
@@ -52,7 +52,7 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
           Center(
             child: ElevatedButton(
               onPressed: () async {
-                await mellowtel.start(context, showDefaultConsentDialog: true,
+                await mellowtel.start(context, showConsentDialog: true,
                     onOptIn: () async {
                   // Handle enabling services when consent is provided.
                 }, onOptOut: () async {

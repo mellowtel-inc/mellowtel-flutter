@@ -20,56 +20,53 @@ class ConsentDialog extends StatelessWidget {
     bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     bool isDesktop = MediaQuery.of(context).size.width > 600;
-    return Container(
-      color: Colors.white,
-      child: SafeArea(
-        child: Container(
-          child: !isLandscape || isDesktop
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(
-                      // vertical: 8.0,
-                      ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInformationWidget(context),
-                        const SizedBox(height: 20.0),
-                        Center(child: _buildActions(context)),
-                      ],
+    return SafeArea(
+      child: Container(
+        child: !isLandscape || isDesktop
+            ? Padding(
+                padding: const EdgeInsets.symmetric(
+                    // vertical: 8.0,
                     ),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                          ),
-                          child: SingleChildScrollView(
-                              child: _buildInformationWidget(context)),
-                        ),
-                      ),
-                      Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                          ),
-                          child: _buildActions(context),
-                        ),
-                      ),
+                      _buildInformationWidget(context),
+                      const SizedBox(height: 20.0),
+                      Center(child: _buildActions(context)),
                     ],
                   ),
                 ),
-        ),
+              )
+            : Padding(
+                padding: const EdgeInsets.symmetric(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                        ),
+                        child: SingleChildScrollView(
+                            child: _buildInformationWidget(context)),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                        ),
+                        child: _buildActions(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -99,11 +96,9 @@ class ConsentDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 16.0),
               const Column(
                 children: [Icon(Icons.sync_alt), Text("")],
               ),
-              const SizedBox(width: 16.0),
               Column(
                 children: [
                   const CircleAvatar(
@@ -116,11 +111,9 @@ class ConsentDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 16.0),
               const Column(
                 children: [Icon(Icons.sync_alt), Text("")],
               ),
-              const SizedBox(width: 16.0),
               Column(
                 children: [
                   const CircleAvatar(
@@ -161,7 +154,7 @@ class ConsentDialog extends StatelessWidget {
                         .pop(true); // Returns true on acceptance
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
@@ -177,7 +170,7 @@ class ConsentDialog extends StatelessWidget {
           Center(
             child: GestureDetector(
               onTap: () async {
-                final url = Uri.parse('https://www.mellowtel.it/flutter/');
+                final url = Uri.parse('https://www.mellowtel.com/mellowtel-privacy-policy/');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 } else {
@@ -223,13 +216,13 @@ class ConsentDialog extends StatelessWidget {
         Align(
           alignment: Alignment.center,
           child: Text(
-            '$incentive, allow mellowtel to use your device\'s free resources and IP address to download public web data from the internet while you are using $appName',
+            '$incentive. If you click on “Yes”, you can share your unused bandwidth with Mellowtel to enable access to public websites helping keep the app free.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
         const SizedBox(height: 16.0),
         Text(
-          'None of your personal information is collected, except your IP address.\n\nYour participation is totally optional and you may opt out at any time.',
+          'It shares internet bandwidth only. No personal information is collected.\n\nYour participation is totally optional. You can opt-in or out at any moment from the settings page.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
