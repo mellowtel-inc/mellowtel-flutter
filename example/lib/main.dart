@@ -77,38 +77,6 @@ class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
             ),
           ),
           const SizedBox(height: 16.0),
-          Center(
-            child: ElevatedButton(
-              onPressed: () async {
-                await mellowtel.test(
-                    ScrapeRequest(
-                        recordID: '005ie7h3w5',
-                        url: 'https://www.google.com',
-                        waitBeforeScraping: 1,
-                        saveHtml: true,
-                        saveMarkdown: true,
-                        htmlVisualizer: true,
-                        orgId: 'mellowtel',
-                        htmlTransformer: 'none',
-                        removeCSSselectors: 'default',
-                        actions: [
-                          //  {"type": "scroll", "direction": "down", "amount": 1000},
-                          // {"type": "wait", "milliseconds": 2000},
-                          // {
-                          //   "type": "click",
-                          //   "selector": 'textarea[title="Search"]'
-                          // },
-
-                          // {"type": "fill_form", "values": {'textarea[title="Search"]': "TEST"}},
-                          // {"type": "wait", "milliseconds": 1000},
-                          // {"type": "press", "key": "Enter"},
-                          // {"type": "wait", "milliseconds": 100},
-                        ]),
-                    context: context);
-              },
-              child: const Text('Test'),
-            ),
-          ),
         ],
       ),
     );
