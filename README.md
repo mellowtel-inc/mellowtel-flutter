@@ -27,14 +27,13 @@ Start by creating an instance of `Mellowtel` with your unique configuration key 
 ```dart
 import 'package:mellowtel/mellowtel.dart';
 
-final Mellowtel mellowtel = Mellowtel(
-    "123", // your designated configuration key as received in email
+final Mellowtel mellowtel = Mellowtel("123",
+  dialogConfiguration: const ConsentDialogConfiguration(
     appName: 'King Kong',
-    appIcon: 'asset/logo.png',
-    incentive:
-        'Earn 500 coins in Sling Kong',
-    yesText: 'Coins!',
-  );
+    incentive: 'Earn 500 coins in Sling Kong',
+    appIcon: 'asset/logo.png', // Optional
+    acceptButtonText: 'Coins!', // Optional
+  ),);
 ```
 
 ### 2. Start the Scraping Process
@@ -43,15 +42,15 @@ Use the `start()` method to signal mellowtel to start operating.
 
 ```dart
 await mellowtel.start(
-      context, // [BuildContext] to show the consent popup.
-      onOptIn: () async {
-        // Handle enabling services when consent is provided.
-      }, 
-      onOptOut: () async {
-        // Handle disabling services if consent is denied.
-      },
-      showConsentDialog: true
-    );
+  context, // [BuildContext] to show the consent popup.
+  onOptIn: () async {
+    // Handle enabling services when consent is provided.
+  }, 
+  onOptOut: () async {
+    // Handle disabling services if consent is denied.
+  },
+  showConsentDialog: true
+);
 ```
 
 This will open up a one-time consent popup for the user to accept.
@@ -66,14 +65,14 @@ Mellowtel ensures full control and privacy for your users. Your users can change
 
 ```dart
 await mellowtel.showConsentSettingsPage(
-    context,
-    onOptIn: () async {
-      // Handle enabling services when consent is provided.
-    }, 
-    onOptOut: () async {
-      // Handle disabling services if consent is denied.
-    },
-  );
+  context,
+  onOptIn: () async {
+    // Handle enabling services when consent is provided.
+  }, 
+  onOptOut: () async {
+    // Handle disabling services if consent is denied.
+  },
+);
 ```
 
 <img src = 'https://raw.githubusercontent.com/mellowtel-inc/mellowtel-flutter/main/assets/settings-popup.png' width = 300px></img>
@@ -90,9 +89,9 @@ To ensure that mellowtel is succesfully operating, test your app with `showDebug
 import 'package:mellowtel/mellowtel.dart';
 
 final Mellowtel mellowtel = Mellowtel(
-    // other params
-    showDebugLogs: true
-  );
+  // other params
+  showDebugLogs: true
+);
 ```
 
 This should start showing: `[MELLOWTEL]: USAGE SUCCESS` in your debug logs within a couple of minutes. If no logs are visible, or you encounter error logs, please contact Mellowtel support.

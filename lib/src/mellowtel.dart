@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:mellowtel/src/exceptions.dart';
+import 'package:mellowtel/src/model/consent_dialog_configuration.dart';
 import 'package:mellowtel/src/model/scrape_request.dart';
 import 'package:mellowtel/src/model/scrape_result.dart';
 import 'package:mellowtel/src/scraping_events.dart';
@@ -31,24 +32,24 @@ class Mellowtel {
   ///
   /// Optional callbacks [onScrapingResult], [onScrapingException], and
   /// [onStorageException] can be provided to handle respective events.
-  Mellowtel(this._configurationKey,
-      {required this.appName,
-      required this.appIcon,
-      required this.incentive,
-      required this.yesText,
-      this.showDebugLogs = false}) {
+  Mellowtel(
+    this._configurationKey, {
+    required this.dialogConfiguration,
+    this.showDebugLogs = false,
+  }) {
     _webViewManager = Platform.isWindows
         ? WindowsWebViewManager()
         : Platform.isMacOS || Platform.isIOS
             ? MacOSWebViewManager()
             : throw Exception(
-                'Only Macos and Windows Platforms are supported.');
+                'Only iOS, Macos and Windows Platforms are supported.');
   }
 
   final String _configurationKey;
+  final ConsentDialogConfiguration dialogConfiguration;
   final bool showDebugLogs;
-  final _storageService = S3Service();
 
+  final _storageService = S3Service();
   WebSocketChannel? _channel;
   late WebViewManager _webViewManager;
 
@@ -58,12 +59,6 @@ class Mellowtel {
       LocalSharedPrefsService(await SharedPreferences.getInstance());
 
   final Connectivity connectivity = Connectivity();
-
-  // Consent dialog values
-  final String appName;
-  final String appIcon;
-  final String incentive;
-  final String yesText;
 
   int _reconnectAttempts = 0;
   final int _maxReconnectAttempts = 5;
@@ -109,16 +104,16 @@ class Mellowtel {
               """Not showing permission consent dialog since [showConsentDialog] is set to `false`.
               
                Either call [start] with  [showConsentDialog] where you would like user to provide consent or set user permission via [optIn] or [optOut] methods manually.""");
-               return ;
+          return;
         }
         if (context.mounted) {
-          consent = await _showConsentDialog(
-            context,
-            appName: appName,
-            appIcon: appIcon,
-            incentive: incentive,
-            yesText: yesText,
-          );
+          consent = await _showConsentDialog(context,
+              appName: dialogConfiguration.appName,
+              appIcon: dialogConfiguration.appIcon,
+              incentive: dialogConfiguration.incentive,
+              acceptButtonText: dialogConfiguration.acceptButtonText,
+              declineButtonText: dialogConfiguration.declineButtonText,
+              dialogTextOverride: dialogConfiguration.dialogTextOverride);
           consent ? await onOptIn() : await onOptOut();
 
           await (await sharedPrefsService).setConsent(consent);
@@ -143,8 +138,8 @@ class Mellowtel {
         _configurationKey, (await sharedPrefsService));
     if (context.mounted) {
       await _showConsentSettingsDialog(context,
-          appName: appName,
-          appIcon: appIcon,
+          appName: dialogConfiguration.appName,
+          appIcon: dialogConfiguration.appIcon,
           consent: previousConsent ?? false, onOptIn: () async {
         await (await sharedPrefsService).setConsent(true);
         await _startScraping();
@@ -269,9 +264,11 @@ class Mellowtel {
   Future<bool> _showConsentDialog(
     BuildContext context, {
     required String appName,
-    required String appIcon,
+    required String? appIcon,
     required String incentive,
-    required String yesText,
+    required String? acceptButtonText,
+    required String? declineButtonText,
+    required String? dialogTextOverride,
   }) async {
     Completer<bool> completer = Completer();
     showDialog(
@@ -284,9 +281,11 @@ class Mellowtel {
           backgroundColor: Theme.of(context).colorScheme.surface,
           content: ConsentDialog(
             appName: appName,
-            asset: appIcon,
+            appIcon: appIcon,
             incentive: incentive,
-            yesText: yesText,
+            acceptButtonText: acceptButtonText,
+            declineButtonText: declineButtonText,
+            dialogTextOverride: dialogTextOverride,
           ),
         );
       },
@@ -300,7 +299,7 @@ class Mellowtel {
 
   Future<void> _showConsentSettingsDialog(BuildContext context,
       {required String appName,
-      required String appIcon,
+      required String? appIcon,
       required OnOptIn onOptIn,
       required OnOptOut onOptOut,
       required bool consent,
@@ -316,7 +315,7 @@ class Mellowtel {
           backgroundColor: Theme.of(context).colorScheme.surface,
           content: ConsentSettingsDialog(
             appName: appName,
-            asset: appIcon,
+            appIcons: appIcon,
             initiallyOptedIn: consent,
             onOptIn: onOptIn,
             onOptOut: onOptOut,
