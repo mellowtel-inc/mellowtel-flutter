@@ -34,7 +34,7 @@ class Mellowtel {
   /// [onStorageException] can be provided to handle respective events.
   Mellowtel(
     this._configurationKey, {
-    required this.consentDialogConfiguration,
+    required this.dialogConfiguration,
     this.showDebugLogs = false,
   }) {
     _webViewManager = Platform.isWindows
@@ -46,7 +46,7 @@ class Mellowtel {
   }
 
   final String _configurationKey;
-  final ConsentDialogConfiguration consentDialogConfiguration;
+  final ConsentDialogConfiguration dialogConfiguration;
   final bool showDebugLogs;
 
   final _storageService = S3Service();
@@ -107,12 +107,12 @@ class Mellowtel {
         }
         if (context.mounted) {
           consent = await _showConsentDialog(context,
-              appName: consentDialogConfiguration.appName,
-              appIcon: consentDialogConfiguration.appIcon,
-              incentive: consentDialogConfiguration.incentive,
-              acceptButtonText: consentDialogConfiguration.acceptButtonText,
-              declineButtonText: consentDialogConfiguration.declineButtonText,
-              dialogTextOverride: consentDialogConfiguration.dialogTextOverride);
+              appName: dialogConfiguration.appName,
+              appIcon: dialogConfiguration.appIcon,
+              incentive: dialogConfiguration.incentive,
+              acceptButtonText: dialogConfiguration.acceptButtonText,
+              declineButtonText: dialogConfiguration.declineButtonText,
+              dialogTextOverride: dialogConfiguration.dialogTextOverride);
           consent ? await onOptIn() : await onOptOut();
 
           await (await sharedPrefsService).setConsent(consent);
@@ -137,8 +137,8 @@ class Mellowtel {
         _configurationKey, (await sharedPrefsService));
     if (context.mounted) {
       await _showConsentSettingsDialog(context,
-          appName: consentDialogConfiguration.appName,
-          appIcon: consentDialogConfiguration.appIcon,
+          appName: dialogConfiguration.appName,
+          appIcon: dialogConfiguration.appIcon,
           consent: previousConsent ?? false, onOptIn: () async {
         await (await sharedPrefsService).setConsent(true);
         await _startScraping();

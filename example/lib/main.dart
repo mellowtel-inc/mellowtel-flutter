@@ -31,7 +31,7 @@ class HtmlExtractorWidget extends StatefulWidget {
 
 class HtmlExtractorWidgetState extends State<HtmlExtractorWidget> {
   final Mellowtel mellowtel = Mellowtel("123",
-      consentDialogConfiguration: const ConsentDialogConfiguration(
+      dialogConfiguration: const ConsentDialogConfiguration(
         appName: 'King Kong',
         incentive: 'Earn 500 coins in Sling Kong',
         appIcon: 'asset/logo.png', // Optional
