@@ -83,9 +83,10 @@ class Mellowtel {
   /// [request] - The scrape request to be tested.
   ///
   /// Use any of the recordIDs 004ie7h3w5, 005ie7h3w5, 006ie7h3w5, 007ie7h3w5 with URL and other params of your choice
-  Future<void> test(ScrapeRequest request) async {
+  Future<void> test(ScrapeRequest request, {BuildContext? context}) async {
     await _webViewManager.initialize();
-    await _onMessage(jsonEncode(request.toJson()));
+    // ignore: use_build_context_synchronously
+    await _onMessage(jsonEncode(request.toJson()), context: context);
     await _webViewManager.dispose();
   }
 
@@ -337,7 +338,7 @@ class Mellowtel {
   /// respective callbacks.
   ///
   /// [message] - The incoming message to be processed.
-  Future<void> _onMessage(dynamic message) async {
+  Future<void> _onMessage(dynamic message, {BuildContext? context}) async {
     final prefs = await SharedPreferences.getInstance();
     final rateLimiter = RateLimiter(prefs);
 
@@ -362,7 +363,24 @@ class Mellowtel {
         await rateLimiter.increment();
 
         ScrapeRequest scrapeRequest = ScrapeRequest.fromJson(data);
+
         ScrapeResult scrapeResult = await _runScrapeRequest(scrapeRequest);
+        if (context != null && scrapeResult.screenshot != null) {
+          Navigator.push(
+            // ignore: use_build_context_synchronously
+            context,
+            MaterialPageRoute(
+                builder: (context) => Scaffold(
+                      appBar: AppBar(),
+                      body: SizedBox.expand(
+                        child: Image.memory(
+                          scrapeResult.screenshot!,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    )),
+          );
+        }
         final UploadResult uploadResult = await _postScrapeRequest(scrapeResult,
             url: scrapeRequest.url,
             htmlTransformer: scrapeRequest.htmlTransformer);

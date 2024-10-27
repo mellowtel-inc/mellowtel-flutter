@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:mellowtel/mellowtel.dart';
 import 'package:html2md/html2md.dart' as html2md;
+import 'package:mellowtel/mellowtel.dart';
 import 'package:mellowtel/src/utils/frame_manager.dart';
 import 'package:mellowtel/src/utils/log.dart';
+import 'package:mellowtel/src/utils/web_view_action.dart';
 
 import 'webview_manager.dart';
 
@@ -15,14 +16,18 @@ class MacOSWebViewManager extends WebViewManager {
 
   @override
   Future<void> initialize() async {
-    PlatformInAppWebViewController.debugLoggingSettings.enabled = loggingEnabled;
-    _headlessWebView = HeadlessInAppWebView(onWebViewCreated: (controller) {
-      logMellowtel("MellowTel: Webview created!");
-      _webViewController = controller;
-    }, onLoadStop: (controller, url) async {
-      _pageLoadCompleter?.complete();
-    }, onProgressChanged: (_, int x) {
-    }, );
+    PlatformInAppWebViewController.debugLoggingSettings.enabled =
+        loggingEnabled;
+    _headlessWebView = HeadlessInAppWebView(
+      onWebViewCreated: (controller) {
+        logMellowtel("MellowTel: Webview created!");
+        _webViewController = controller;
+      },
+      onLoadStop: (controller, url) async {
+        _pageLoadCompleter?.complete();
+      },
+      onProgressChanged: (_, int x) {},
+    );
 
     await _headlessWebView!.run();
   }
@@ -35,6 +40,7 @@ class MacOSWebViewManager extends WebViewManager {
       await _headlessWebView!.setSize(request.windowSize!);
     }
     await _loadUrlAndWait(request.url, request.removeCSSselectors);
+    await _performActions(request.actions);
     await Future.delayed(Duration(seconds: request.waitBeforeScraping));
     final result = await _webViewController!
         .evaluateJavascript(source: 'document.documentElement.outerHTML');
@@ -89,6 +95,19 @@ class MacOSWebViewManager extends WebViewManager {
       })();
     ''';
       await _webViewController!.evaluateJavascript(source: jsCode);
+    }
+  }
+
+  Future<void> _performActions(List<Map<String, dynamic>> actions) async {
+    if (_webViewController == null) return;
+
+    for (var action in actions) {
+      WebViewAction webViewAction = WebViewActionFactory.create(action);
+      try {
+        await webViewAction.perform(_webViewController!);
+      } catch (e) {
+        logMellowtel("Failed to perform action $action for $e");
+      }
     }
   }
 
