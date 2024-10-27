@@ -88,7 +88,9 @@ class PressAction extends WebViewAction {
     );
   }
 }
-
+/// Currently not supported. 
+/// 
+/// Reason: MutationObserver Promise completes within the js and the flutter js execution doesn't wait for it.
 class WaitForAction extends WebViewAction {
   final String selector;
 
@@ -114,6 +116,10 @@ class WaitForAction extends WebViewAction {
   }
 }
 
+
+/// Currently not supported. 
+/// 
+/// Reason: MutationObserver Promise completes within the js and the flutter js execution doesn't wait for it.
 class WaitForAndClickAction extends WebViewAction {
   final String selector;
 
