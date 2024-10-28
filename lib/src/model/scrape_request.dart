@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 /// Only for internal use
@@ -51,7 +52,7 @@ class ScrapeRequest {
         htmlTransformer: json['htmlTransformer'] as String? ?? 'none',
         removeCSSselectors: json['removeCSSselectors'],
         actions: json['actions'] != null
-            ? List<Map<String, dynamic>>.from(json['actions'])
+            ? List<Map<String, dynamic>>.from(jsonDecode(json['actions']))
             : []
     );
   }
