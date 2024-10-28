@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+/// Only for internal use
 class ScrapeRequest {
   final String url;
   final int waitBeforeScraping;

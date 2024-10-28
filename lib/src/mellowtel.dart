@@ -23,15 +23,9 @@ import 'package:flutter/material.dart';
 import 'package:mellowtel/src/utils/identity_helpers.dart'; // Import the identity helpers
 import 'package:connectivity_plus/connectivity_plus.dart'; // Import the connectivity_plus package
 
-/// The `Mellowtel` class provides methods to manage web scraping tasks
-/// using WebView and WebSocket connections.
+
 class Mellowtel {
-  /// Creates an instance of `Mellowtel`.
-  ///
-  /// The [_configurationKey] should be a constant specific to the device and is required to identify the node to receieve data from Mellowtel.
-  ///
-  /// Optional callbacks [onScrapingResult], [onScrapingException], and
-  /// [onStorageException] can be provided to handle respective events.
+  /// Creates an instance of `Mellowtel` with the configuration for the consent dialogs.
   Mellowtel(
     this._configurationKey, {
     required this.dialogConfiguration,
@@ -44,9 +38,15 @@ class Mellowtel {
             : throw Exception(
                 'Only iOS, Macos and Windows Platforms are supported.');
   }
-
+  /// [_configurationKey] provided to you by Mellowtel.
   final String _configurationKey;
+
+  /// UI configuration to customize the consent dialog for your users.
   final ConsentDialogConfiguration dialogConfiguration;
+
+  /// To test if mellowtel integration is successful. Should give `[MELLOWTEL]: USAGE SUCCESS` in your debug logs within a couple of minutes. 
+  /// 
+  /// If no logs are visible, or you encounter error logs, please contact Mellowtel support.
   final bool showDebugLogs;
 
   final _storageService = S3Service();
@@ -72,12 +72,31 @@ class Mellowtel {
   ///
   /// Tests the crawling process with a given [request].
   ///
-  /// This method initializes the WebView, sends the [request] as a message,
-  /// and then disposes of the WebView.
-  ///
-  /// [request] - The scrape request to be tested.
-  ///
-  /// Use any of the recordIDs 004ie7h3w5, 005ie7h3w5, 006ie7h3w5, 007ie7h3w5 with URL and other params of your choice
+  // mellowtel.test(
+  // ScrapeRequest(
+  //     recordID: '005ie7h3w5',
+  //     url: 'https://www.google.com',
+  //     waitBeforeScraping: 1,
+  //     saveHtml: true,
+  //     saveMarkdown: true,
+  //     htmlVisualizer: true,
+  //     orgId: 'mellowtel',
+  //     htmlTransformer: 'none',
+  //     removeCSSselectors: 'default',
+  //     actions: [
+  //       //  {"type": "scroll", "direction": "down", "amount": 1000},
+  //       // {"type": "wait", "milliseconds": 2000},
+  //       // {
+  //       //   "type": "click",
+  //       //   "selector": 'textarea[title="Search"]'
+  //       // },
+
+  //       // {"type": "fill_form", "values": {'textarea[title="Search"]': "TEST"}},
+  //       // {"type": "wait", "milliseconds": 1000},
+  //       // {"type": "press", "key": "Enter"},
+  //       // {"type": "wait", "milliseconds": 100},
+  //     ]),
+  // context: context);
   Future<void> test(ScrapeRequest request, {BuildContext? context}) async {
     await _webViewManager.initialize();
     // ignore: use_build_context_synchronously
@@ -85,12 +104,12 @@ class Mellowtel {
     await _webViewManager.dispose();
   }
 
-  /// Starts the crawling process by establishing a WebSocket connection.
+  /// Signal mellowtel to start operations.
   ///
-  /// [onOptIn] and [onOptOut] allow you to enable or disable services based on user's choice.
+  /// [onOptIn] and [onOptOut] allow you to enable or disable rewards based on user's choice.
   /// They are only called the first time user makes a choice or if changes their consent later.
   ///
-  /// [showConsentDialog]: `true` by default. Set `false` if you have to show the permission dialog manually or somewhere else
+  /// [showConsentDialog]: `true` by default. Set `false` if you have to show the permission dialog manually or somewhere else.
   Future<void> start(BuildContext context,
       {required OnOptIn onOptIn,
       required OnOptOut onOptOut,
@@ -131,6 +150,8 @@ class Mellowtel {
     }
   }
 
+
+  /// Show mellowtel settings page for user to check and manage their consent.
   Future<void> showConsentSettingsPage(BuildContext context,
       {required OnOptIn onOptIn, required OnOptOut onOptOut}) async {
     final previousConsent = (await sharedPrefsService).getConsent();
@@ -152,7 +173,7 @@ class Mellowtel {
     }
   }
 
-  /// Provide consent on behalf of user
+  /// Manually mark user as opted in.
   Future<void> optIn() async {
     final previousConsent = (await sharedPrefsService).getConsent();
     if (previousConsent == null || !previousConsent) {
@@ -161,7 +182,7 @@ class Mellowtel {
     }
   }
 
-  /// Revoke consent on behalf of user
+  /// Manually mark user as opted out.
   Future<void> optOut() async {
     final previousConsent = (await sharedPrefsService).getConsent();
     if (previousConsent != null && previousConsent) {
@@ -170,9 +191,7 @@ class Mellowtel {
     }
   }
 
-  /// Stops the crawling process by closing the WebSocket connection.
-  ///
-  /// This method closes the WebSocket connection and disposes of the  WebView.
+  /// Stops mellowtel operations.
   Future<void> stop() async {
     _fakeSocket?.cancel();
     await _channel?.sink.close();
@@ -181,7 +200,7 @@ class Mellowtel {
     _initialized = false;
   }
 
-  /// To check user's consent
+  /// Get user's consent status
   Future<bool?> checkConsent() async {
     return LocalSharedPrefsService(await SharedPreferences.getInstance())
         .getConsent();
