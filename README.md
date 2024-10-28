@@ -27,12 +27,12 @@ Start by creating an instance of `Mellowtel` with your unique configuration key 
 ```dart
 import 'package:mellowtel/mellowtel.dart';
 
-final Mellowtel mellowtel = Mellowtel("123",
+final Mellowtel mellowtel = Mellowtel("mellowtel_key",
   dialogConfiguration: const ConsentDialogConfiguration(
     appName: 'King Kong',
     incentive: 'Earn 500 coins in Sling Kong',
     appIcon: 'asset/logo.png', // Optional
-    acceptButtonText: 'Coins!', // Optional
+    acceptButtonText: 'Yes Coins!', // Optional
   ),);
 ```
 
@@ -49,7 +49,6 @@ await mellowtel.start(
   onOptOut: () async {
     // Handle disabling services if consent is denied.
   },
-  showConsentDialog: true
 );
 ```
 
@@ -57,7 +56,6 @@ This will open up a one-time consent popup for the user to accept.
 
 <img src = 'https://raw.githubusercontent.com/mellowtel-inc/mellowtel-flutter/main/assets/consent-popup.png' width = 300px></img>
 
-> You can change `showConsentDialog` param to false to ask for consent manually or in a differnt page after a successful user interaction.
 
 ### 3. Consent Settings Page (Optional)
 
@@ -80,9 +78,9 @@ await mellowtel.showConsentSettingsPage(
 
 
 
-### 4. Befrore you deploy 
+### 4. Before you deploy 
 
-To ensure that mellowtel is succesfully operating, test your app with `showDebugLogs` set to true.
+To ensure that mellowtel is successfully operating, test your app with `showDebugLogs` set to true.
 
 
 ```dart

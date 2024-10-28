@@ -1,3 +1,7 @@
+## 0.0.5
+
+* UI customization options
+
 ## 0.0.4
 
 * Consent Dialog Copywriting Improvements
